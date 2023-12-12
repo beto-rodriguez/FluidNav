@@ -58,8 +58,7 @@
 
 	<ItemGroup>
 	  <None Remove="Resources\Fonts\icons.ttf" />
-	  <None Remove="Resources\Fonts\Outfit-VariableFont_wght.ttf" />
-	  <None Remove="Resources\Fonts\RobotoMono-VariableFont_wght.ttf" />
+	  <None Remove="Resources\Fonts\Outfit-Regular.ttf" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -71,13 +70,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="FluidHostPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+	  <ProjectReference Include="..\src\FluidNav.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\FluidNav.csproj" />
+	  <MauiXaml Update="FluidHostPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>

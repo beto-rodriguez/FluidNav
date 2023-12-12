@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics;
-using CommunityToolkit.Maui.Markup;
+﻿using CommunityToolkit.Maui.Markup;
 using FluidNav;
 using Microsoft.Extensions.Logging;
 using Sample.ViewModels;
@@ -17,12 +15,11 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkitMarkup()
             .ConfigureFonts(fonts => fonts
-                .AddFont("RobotoMono-VariableFont_wght", "RobotoMono")
-                .AddFont("Outfit-VariableFont_wght.ttf", "Outfit")
+                .AddFont("Outfit-Regular.ttf", "Outfit")
                 .AddFont("icons.ttf", "Icons"))
             .UseFluidNav<FluidHostPage>(r => r
                 //.AddRoute<AbsoluteTest>()
-                //.AddRoute<UsersCollection, UsersCollectionVM>()
+                .AddRoute<UsersCollection, UsersCollectionVM>()
                 .AddRoute<User, UserVM>());
 
         builder.Services

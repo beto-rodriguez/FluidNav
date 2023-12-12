@@ -44,12 +44,4 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
-
-    <OnPlatform x:Key="FontFamily" x:TypeArguments="x:String">
-        <!-- the outfit font is not loading correctly on adroid, it seems that the weight is wrong -->
-        <On Platform="iOS" Value="Outfit" />
-        <On Platform="WinUI" Value="Outfit" />
-        <On Platform="Android" Value="RobotoMono" />
-    </OnPlatform>
-
 </ResourceDictionary>

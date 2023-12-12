@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Markup;
-using Sample.MarkupHelpers;
+using FluidNav;
+using FluidNav.Flowing;
 using Sample.ViewModels;
 
 namespace Sample.Views;
@@ -12,8 +13,19 @@ public class UsersCollection : ContentView
             .ItemsSource(viewModel.Users)
             .ItemTemplate(new DataTemplate(() =>
             {
-                var user = new User();
-                return user.GetContent().FlowToResult(user.Expanded);
+                return User
+                    .GetFlowView(view =>
+                    {
+                        _ = view
+                            .TapGesture(async () =>
+                            {
+                                var user = (UserVM)view.BindingContext;
+                                view.ZIndex = int.MaxValue;
+                                _ = await view.Flow(view.CardViewFlow);
+                                //Fluid.MainView.GoTo<User>($"id={user.Id}");
+                            })
+                            .FlowToResult(view.ListViewFlow);
+                    });
             }));
     }
 }

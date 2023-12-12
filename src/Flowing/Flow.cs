@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Sample.MarkupHelpers;
+namespace FluidNav.Flowing;
 
 public class Flow(VisualElement visual) : IEnumerable<FlowProperty>
 {

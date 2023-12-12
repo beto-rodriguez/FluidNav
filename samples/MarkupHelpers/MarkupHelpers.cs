@@ -11,13 +11,6 @@ public static class MarkupHelpers
         return border;
     }
 
-    public static TView Children<TView>(this TView view, params View[] children)
-        where TView : Layout
-    {
-        foreach (var child in children) view.Children.Add(child);
-        return view;
-    }
-
     public static TVisualElement Style<TVisualElement>(
         this TVisualElement element,
         Action<Style<TVisualElement>> styleBuilder)

@@ -1,4 +1,4 @@
-﻿namespace Sample.MarkupHelpers;
+﻿namespace FluidNav.Flowing;
 
 public static class FluidAnimationsExtensions
 {
@@ -7,27 +7,34 @@ public static class FluidAnimationsExtensions
         return new Flow(element);
     }
 
-    public static Flow ToDouble(this Flow flow, BindableProperty property, double value)
+    public static Flow ToDouble(
+        this Flow flow, BindableProperty property, double value, double start = 0, double end = 1)
     {
         if (property.ReturnType != typeof(double))
             throw new ArgumentException("Property flow error. Property must be of type double", nameof(property));
 
         return flow.Add(
             new FlowProperty(
-                flow.VisualElement, property, value, () =>
+                flow.VisualElement,
+                property,
+                value,
+                () =>
                 {
                     var start = (double)flow.VisualElement.GetValue(property);
                     return t => start + t * (value - start);
-                }));
+                },
+                start,
+                end));
     }
 
-    public static Flow ToMargin(this Flow flow, double left = 0, double top = 0, double right = 0, double bottom = 0)
+    public static Flow ToMargin(
+        this Flow flow, double left = 0, double top = 0, double right = 0, double bottom = 0, double start = 0, double end = 1)
     {
-        return flow.ToThickness(View.MarginProperty, left, top, right, bottom);
+        return flow.ToThickness(View.MarginProperty, left, top, right, bottom, start, end);
     }
 
     public static Flow ToThickness(
-        this Flow flow, BindableProperty property, double left = 0, double top = 0, double right = 0, double bottom = 0)
+        this Flow flow, BindableProperty property, double left = 0, double top = 0, double right = 0, double bottom = 0, double start = 0, double end = 1)
     {
         if (property.ReturnType != typeof(Thickness))
             throw new ArgumentException("Property flow error. Property must be of type Thickness", nameof(property));
@@ -36,7 +43,10 @@ public static class FluidAnimationsExtensions
 
         return flow.Add(
             new FlowProperty(
-                flow.VisualElement, property, value, () =>
+                flow.VisualElement,
+                property,
+                value,
+                () =>
                 {
                     var start = (Thickness)flow.VisualElement.GetValue(property);
                     return t => new Thickness(
@@ -44,17 +54,43 @@ public static class FluidAnimationsExtensions
                         start.Top + t * (value.Top - start.Top),
                         start.Right + t * (value.Right - start.Right),
                         start.Bottom + t * (value.Bottom - start.Bottom));
-                }));
+                },
+                start,
+                end));
     }
 
-    public static Flow ToLayoutBounds(
-        this Flow flow, double x, double y)
+    public static Flow ToColor(
+        this Flow flow, BindableProperty property, Color color, double start = 0, double end = 1)
     {
-        return ToLayoutBounds(flow, x, y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize);
+        if (property.ReturnType != typeof(Color))
+            throw new ArgumentException("Property flow error. Property must be of type Color", nameof(property));
+
+        return flow.Add(
+            new FlowProperty(
+            flow.VisualElement,
+            property,
+            color,
+            () =>
+            {
+                var start = (Color)flow.VisualElement.GetValue(property);
+                return t => Color.FromRgba(
+                    start.Red + t * (color.Red - start.Red),
+                    start.Green + t * (color.Green - start.Green),
+                    start.Blue + t * (color.Blue - start.Blue),
+                    start.Alpha + t * (color.Alpha - start.Alpha));
+            },
+            start,
+            end));
     }
 
     public static Flow ToLayoutBounds(
-        this Flow flow, double x, double y, double width, double height)
+        this Flow flow, double x, double y, double start = 0, double end = 1)
+    {
+        return flow.ToLayoutBounds(x, y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize, start, end);
+    }
+
+    public static Flow ToLayoutBounds(
+        this Flow flow, double x, double y, double width, double height, double start = 0, double end = 1)
     {
         return flow.Add(
             new FlowProperty(
@@ -69,14 +105,16 @@ public static class FluidAnimationsExtensions
                         start.Y + t * (y - start.Y),
                         start.Width + t * (width - start.Width),
                         start.Height + t * (height - start.Height));
-                }));
+                },
+                start,
+                end));
     }
 
     /// <summary>
     /// Sets all the flow properties to their target values (without animations).
     /// </summary>
     /// <param name="view">The target view.</param>
-    /// <param name="flowCollection"></param>
+    /// <param name="flowCollection">da flow.</param>
     /// <returns></returns>
     public static View FlowToResult(this View view, IEnumerable<Flow> flowCollection)
     {
@@ -90,6 +128,7 @@ public static class FluidAnimationsExtensions
     /// <summary>
     /// Starts a flow animation and returns a task that completes when the animation ends.
     /// </summary>
+    /// <param name="view">The target view.</param>
     /// <param name="flowCollection">da flow.</param>
     /// <param name="owner">Identifies the owner of the animation. This can be the visual element on which the animation is applied, or another visual element, such as the page</param>
     /// <param name="duration">The duration in milliseconds.</param>
@@ -98,21 +137,27 @@ public static class FluidAnimationsExtensions
     /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
     /// <returns>A task that completes when the animations ends.</returns>
     public static Task<bool> Flow(
-        this IEnumerable<Flow> flowCollection, VisualElement owner, uint duration = 500,
+        this View view, IEnumerable<Flow> flowCollection, VisualElement? owner = null, uint duration = 500,
         Easing? easing = null, uint fps = 60, string? animationName = null)
     {
-        var animation = new Animation();
+        var parentAnimation = new Animation();
 
         foreach (var flow in flowCollection)
             foreach (var flowProperty in flow)
-                animation.Add(0, 1, flowProperty.GetAnimation());
-
-        animationName ??= $"animation-{Guid.NewGuid()}";
-        easing ??= Easing.CubicOut;
+                parentAnimation.Add(
+                    flowProperty.Start,
+                    flowProperty.End,
+                    flowProperty.GetAnimation());
 
         var taskCompletionSource = new TaskCompletionSource<bool>();
-        animation.Commit(
-            owner, animationName, 1000 / fps, duration, easing, (v, c) => taskCompletionSource.SetResult(c));
+
+        parentAnimation.Commit(
+            owner ?? view,
+            animationName ?? $"animation-{Guid.NewGuid()}",
+            1000 / fps,
+            duration,
+            easing ?? Easing.CubicOut,
+            (v, c) => taskCompletionSource.SetResult(c));
 
         return taskCompletionSource.Task;
     }

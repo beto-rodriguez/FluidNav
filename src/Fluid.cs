@@ -33,7 +33,8 @@ public static class Fluid
                     ?? throw new Exception($"Unable to find an {nameof(IFluidPage)} in the app.");
 
                 return MainView = new FluidContainer(provider, host, map);
-            });
+            })
+            .AddSingleton(typeof(RouteParams));
 
         return builder;
     }
