@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using Sample.MarkupHelpers;
 using Sample.ViewModels;
 
 namespace Sample.Views;
@@ -11,7 +12,8 @@ public class UsersCollection : ContentView
             .ItemsSource(viewModel.Users)
             .ItemTemplate(new DataTemplate(() =>
             {
-                return new User().GetContent();
+                var user = new User();
+                return user.GetContent().FlowToResult(user.Expanded);
             }));
     }
 }

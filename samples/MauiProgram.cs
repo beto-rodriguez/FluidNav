@@ -21,6 +21,7 @@ public static class MauiProgram
                 .AddFont("Outfit-VariableFont_wght.ttf", "Outfit")
                 .AddFont("icons.ttf", "Icons"))
             .UseFluidNav<FluidHostPage>(r => r
+                //.AddRoute<AbsoluteTest>()
                 //.AddRoute<UsersCollection, UsersCollectionVM>()
                 .AddRoute<User, UserVM>());
 

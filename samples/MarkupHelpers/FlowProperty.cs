@@ -1,6 +1,6 @@
 ﻿namespace Sample.MarkupHelpers;
 
-public class PropertyState(
+public class FlowProperty(
     BindableObject bindable,
     BindableProperty property,
     object targetValue,

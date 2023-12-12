@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using Microsoft.Maui.Layouts;
 using Sample.MarkupHelpers;
 using Sample.ViewModels;
 
@@ -6,14 +7,17 @@ namespace Sample.Views;
 
 public class User : ContentView
 {
+    private readonly View _content;
+
+    private readonly AbsoluteLayout _titleWrapper = [];
     private readonly Border _avatar = new();
     private readonly Label _nameLabel = new();
     private readonly Label _dateLabel = new();
     private readonly Button _addButton = new();
 
-    private readonly double _cardPadding = 25;
-    private readonly double _cardWidth = 400d;
-    private readonly double _contentWidth;
+    //private readonly double _cardPadding = 25;
+    //private readonly double _cardWidth = 400d;
+    //private readonly double _contentWidth;
     private readonly double _avatarSize = 50;
     private readonly double _avatarStrokeThickness = 2;
 
@@ -23,40 +27,46 @@ public class User : ContentView
     {
         BindingContext = new UserVM();
 
-        _contentWidth = _cardWidth - _cardPadding * 2;
+        _ = _avatar.LayoutFlags(AbsoluteLayoutFlags.PositionProportional);
+        _ = _nameLabel.LayoutFlags(AbsoluteLayoutFlags.PositionProportional);
+        _ = _dateLabel.LayoutFlags(AbsoluteLayoutFlags.PositionProportional);
+        _ = _addButton.LayoutFlags(AbsoluteLayoutFlags.PositionProportional);
 
-        Expanded = () => [
-            _avatar.StateForLayoutBounds(0, 0),
-            _nameLabel.StateForLayoutBounds(_avatarSize + _avatarStrokeThickness * 2 + 20, 0),
-            _dateLabel.StateForLayoutBounds(_avatarSize + _avatarStrokeThickness * 2 + 20, 30),
-            _addButton.StateForLayoutBounds(_contentWidth - _cardPadding - 10, 0),
-            _addButton.StateForDoubleProperty(ScaleProperty, 1)
+        Expanded = [
+            _avatar.Flows().ToLayoutBounds(0, 0),
+            _nameLabel.Flows().ToMargin(left: 70, top: 5).ToLayoutBounds(0, 0),
+            _dateLabel.Flows().ToMargin(left: 70, top: 30).ToLayoutBounds(0, 0),
+            _addButton.Flows().ToDouble(ScaleProperty, 1).ToLayoutBounds(1, 0)
         ];
 
-        Contracted = () => [
-            _avatar.StateForLayoutBounds(_contentWidth * 0.5 - _avatar.Width * 0.5, 0),
-            _nameLabel.StateForLayoutBounds(_contentWidth * 0.5 - _nameLabel.Width * 0.5, 60),
-            _dateLabel.StateForLayoutBounds(_contentWidth * 0.5 - _dateLabel.Width * 0.5, 80),
-            _addButton.StateForLayoutBounds(_contentWidth * 0.5 - _addButton.Width * 0.5 + 25, 25),
-            _addButton.StateForDoubleProperty(ScaleProperty, 0.5)
+        Contracted = [
+            _avatar.Flows().ToLayoutBounds(0.5, 0),
+            _nameLabel.Flows().ToMargin(top: 50).ToLayoutBounds(0.5, 0.5),
+            _dateLabel.Flows().ToMargin(top: 80).ToLayoutBounds(0.5, 0.5),
+            _addButton.Flows().ToMargin(left: 30).ToDouble(ScaleProperty, 0.5).ToLayoutBounds(0.5, 0.5),
         ];
 
         Content = new Border()
             .Style(style => style
                 .Add(BackgroundColorProperty, Colors.White)
-                .Add(WidthRequestProperty, _cardWidth)
-                .Add(PaddingProperty, new Thickness(_cardPadding))
+                //.Add(WidthRequestProperty, _cardWidth)
+                .Add(PaddingProperty, new Thickness(25))
                 .Add(Border.StrokeThicknessProperty, 0d)
                 .Add(Border.StrokeShapeProperty, Shapes.RoundRectangle(40d))
                 .Add(MarginProperty, new Thickness(20))
                 .Add(ShadowProperty, Shadows.Small()))
-            .TapGesture(() =>
-            {
-                _ = ((_isExpanded = !_isExpanded) ? Expanded : Contracted)()
-                    .GetAnimation()
-                    .Start(this);
-            })
-            .Content(GetContent().SetState(Expanded()));
+            //.TapGesture(() =>
+            //{
+            //    _ = ((_isExpanded = !_isExpanded) ? Expanded : Contracted)
+            //        .GetAnimation()
+            //        .Start(this);
+            //})
+            .Content(_content = GetContent());
+
+        Loaded += (s, e) =>
+        {
+            _ = _content.FlowToResult(Expanded);
+        };
     }
 
     public View GetContent()
@@ -66,13 +76,14 @@ public class User : ContentView
             {
                 Children =
                 {
-                    new AbsoluteLayout
-                    {
-                        Background = Colors.Red,
-                        HeightRequest = _avatarSize + _avatarStrokeThickness * 2,
-                        WidthRequest = _contentWidth,
-                        Children =
+                    new AbsoluteLayout()
+                        .Background(Colors.Red)
+                        .TapGesture(() =>
                         {
+                            _ = ((_isExpanded = !_isExpanded) ? Contracted : Expanded)
+                                   .Flow(this);
+                        })
+                        .Children(
                             _avatar
                                 .Style(style => style
                                     .Add(Border.StrokeProperty, Colors.LightGray)
@@ -110,16 +121,15 @@ public class User : ContentView
                                     .Add(Button.FontFamilyProperty, "Icons")
                                     .Add(Button.CornerRadiusProperty, 20)
                                     .Add(Button.PaddingProperty, new Thickness(0))
-                                    .Add(ShadowProperty, Shadows.Small()))
+                                    //.Add(ShadowProperty, Shadows.Small())
+                                    )
                                 .Size(40)
                                 .MinSize(10)
-                                .Text("+")
-                        }
-                    }
+                                .Text("+"))
                 }
             };
     }
 
-    public Func<PropertyState[]> Expanded { get; } = () => [];
-    public Func<PropertyState[]> Contracted { get; } = () => [];
+    public Flow[] Expanded { get; set; }
+    public Flow[] Contracted { get; set; }
 }
