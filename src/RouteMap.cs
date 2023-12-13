@@ -27,7 +27,7 @@ public class RouteMap(IServiceCollection services)
     /// <param name="route">The route name. If not specified, the view type name in lower case will be used.</param>
     /// <returns>The current map.</returns>
     public RouteMap AddRoute<TView>(string? route = null)
-        where TView : ContentView, new()
+        where TView : ContentView
     {
         return AddRoute<TView, TView>();
     }
@@ -47,8 +47,8 @@ public class RouteMap(IServiceCollection services)
         var routeName = viewType.Name;
 
         _routes.Add(routeName, viewType);
-        _ = services.AddTransient(viewModelType);
-        _ = services.AddTransient(viewType);
+        _ = services.AddSingleton(viewModelType);
+        _ = services.AddSingleton(viewType);
 
         DefaultRoute ??= viewType;
 

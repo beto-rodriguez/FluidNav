@@ -24,7 +24,7 @@ public class FluidContainer
         NavigationPage.SetHasNavigationBar((Page)view, false);
 
         if (map.DefaultRoute is null) throw new Exception("Default route not set");
-        GoTo(map.DefaultRoute);
+        _ = GoTo(map.DefaultRoute);
     }
 
     public IFluidPage FluidView { get; }
@@ -39,9 +39,9 @@ public class FluidContainer
     /// </summary>
     /// <typeparam name="TRoute">The type of the route.</typeparam>
     /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
-    public void GoTo<TRoute>(string? queryParams = null)
+    public View GoTo<TRoute>(string? queryParams = null)
     {
-        GoTo(typeof(TRoute).Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
+        return GoTo(typeof(TRoute).Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
     }
 
     /// <summary>
@@ -49,12 +49,17 @@ public class FluidContainer
     /// </summary>
     /// <param name="type">The type of the route.</param>
     /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
-    public void GoTo(Type type, string? queryParams = null)
+    public View GoTo(Type type, string? queryParams = null)
     {
-        GoTo(type.Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
+        return GoTo(type.Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
     }
 
-    public void GoTo(string route)
+    /// <summary>
+    /// Navigates to the specified view type.
+    /// </summary>
+    /// <param name="type">The type of the route.</param>
+    /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
+    public View GoTo(string route)
     {
         var routeName = route.Split('?')[0];
 
@@ -64,29 +69,29 @@ public class FluidContainer
         _navigationStack.Add(route);
         _activeIndex = _navigationStack.Count - 1;
 
-        Go();
+        return Go();
     }
 
     /// <summary>
     /// Navigates back.
     /// </summary>
-    public void GoBack()
+    public View GoBack()
     {
         _activeIndex--;
         if (_activeIndex < 0) _activeIndex = 0;
 
-        Go();
+        return Go();
     }
 
     /// <summary>
     /// Navigates forward.
     /// </summary>
-    public void GoNext()
+    public View GoNext()
     {
         _activeIndex++;
         if (_activeIndex >= _navigationStack.Count) _activeIndex = _navigationStack.Count - 1;
 
-        Go();
+        return Go();
     }
 
     /// <summary>
@@ -95,10 +100,10 @@ public class FluidContainer
     public void Refresh()
     {
         FluidView.Presenter.Content = null;
-        Go();
+        _ = Go();
     }
 
-    private void Go()
+    private View Go()
     {
         var routeParts = _navigationStack[_activeIndex].Split('?');
 
@@ -110,6 +115,17 @@ public class FluidContainer
         if (queryParams.Length > 0) routeParams?.SetParams(queryParams);
 
         var targetType = ActiveRoutes[routeName];
-        FluidView.Presenter.Content = (View?)_provider.GetService(targetType);
+
+        var view = (View)_provider.GetService(targetType)! ??
+            throw new Exception($"View {targetType.Name} not found");
+
+        FluidView.Presenter.Content = view;
+
+        if (view is FluidView fluidView)
+        {
+            fluidView.OnEnter();
+        }
+
+        return view;
     }
 }

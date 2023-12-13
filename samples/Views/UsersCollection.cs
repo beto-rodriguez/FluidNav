@@ -1,16 +1,25 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using FluidNav;
 using FluidNav.Flowing;
+using Sample.Data;
 using Sample.ViewModels;
 
 namespace Sample.Views;
 
-public class UsersCollection : ContentView
+public class UsersCollection : FluidView
 {
-    public UsersCollection(UsersCollectionVM viewModel)
+    private UserFlowView? _activeUserView;
+
+    public UsersCollection(DataAccessLayer dal)
     {
-        Content = new CollectionView()
-            .ItemsSource(viewModel.Users)
+        var collectionView = new CollectionView
+        {
+            // Hack to get the CollectionView to scroll to the top always
+            Footer = new BoxView().Size(10, 900)
+        };
+
+        Content = collectionView
+            .ItemsSource(dal.Users)
             .ItemTemplate(new DataTemplate(() =>
             {
                 return User
@@ -19,13 +28,28 @@ public class UsersCollection : ContentView
                         _ = view
                             .TapGesture(async () =>
                             {
+                                _activeUserView = view;
+
                                 var user = (UserVM)view.BindingContext;
-                                view.ZIndex = int.MaxValue;
+                                collectionView.ScrollTo(user, position: ScrollToPosition.Start);
+
                                 _ = await view.Flow(view.CardViewFlow);
-                                //Fluid.MainView.GoTo<User>($"id={user.Id}");
+
+                                var resultView = Fluid.MainView.GoTo<User>();
+                                resultView.BindingContext = dal.Users[user.Id];
                             })
                             .FlowToResult(view.ListViewFlow);
                     });
             }));
     }
+
+    public override void OnEnter()
+    {
+        if (_activeUserView is null) return;
+
+        _ = _activeUserView.Flow(_activeUserView.ListViewFlow);
+    }
+
+    public override void OnLeave()
+    { }
 }

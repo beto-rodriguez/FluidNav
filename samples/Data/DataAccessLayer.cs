@@ -2,11 +2,11 @@
 
 namespace Sample.Data;
 
-public static class DataAccessLayer
+public class DataAccessLayer
 {
-    public static UserVM[] Users { get; } =
+    public UserVM[] Users { get; } =
         Enumerable
-            .Range(0, 1000)
+            .Range(0, 100)
             .Select(i => new UserVM { Id = i, Name = $"Artist {i}" })
             .ToArray();
 }

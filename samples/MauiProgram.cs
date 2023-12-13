@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using FluidNav;
 using Microsoft.Extensions.Logging;
+using Sample.Data;
 using Sample.ViewModels;
 using Sample.Views;
 
@@ -19,11 +20,12 @@ public static class MauiProgram
                 .AddFont("icons.ttf", "Icons"))
             .UseFluidNav<FluidHostPage>(r => r
                 //.AddRoute<AbsoluteTest>()
-                .AddRoute<UsersCollection, UsersCollectionVM>()
+                .AddRoute<UsersCollection>()
                 .AddRoute<User, UserVM>());
 
         builder.Services
-            .AddSingleton<ICommunityToolkitHotReloadHandler, HotReloadHandler>();
+            .AddSingleton<ICommunityToolkitHotReloadHandler, HotReloadHandler>()
+            .AddSingleton<DataAccessLayer>();
 
 #if DEBUG
         builder.Logging.AddDebug();

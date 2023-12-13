@@ -1,10 +1,8 @@
-﻿using FluidNav;
-using FluidNav.Flowing;
+﻿using FluidNav.Flowing;
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Maui.Layouts;
 using Sample.MarkupHelpers;
 using Sample.ViewModels;
-using Sample.Data;
 
 namespace Sample.Views;
 
@@ -19,13 +17,8 @@ public class User : ContentView
     private readonly double _avatarSize = 50;
     private readonly double _avatarStrokeThickness = 2;
 
-    public User(RouteParams routeParams)
+    public User()
     {
-        var id = int.Parse(routeParams["id"]);
-        var user = DataAccessLayer.Users[id];
-
-        BindingContext = user;
-
         //Content = new Border()
         //{
         //    Style = new Style<Border>()
