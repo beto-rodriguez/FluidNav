@@ -5,7 +5,7 @@ Fluid nav is an experimental alternative to maui `Shell` it also uses a URI-base
 ### Why?
 
 - The MAUI default shell is hard to customize, with this control you can use any XAML view and use it as a host of your app.
-- it is inspired [web transitions api](https://developer.chrome.com/docs/web-platform/view-transitions/) idea, bases on [this](https://live-transitions.pages.dev/) example.
+- it is inspired on the [web transitions api](https://developer.chrome.com/docs/web-platform/view-transitions/) idea, and the sample provided here has an example based on [this](https://live-transitions.pages.dev/).
 
 ### Disclaim
 
