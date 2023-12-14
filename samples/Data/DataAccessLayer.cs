@@ -4,7 +4,7 @@ namespace Sample.Data;
 
 public class DataAccessLayer
 {
-    public PlaylistVM[] Users { get; } = [
+    private static readonly PlaylistVM[] s_users = [
         new PlaylistVM
         {
             Id = 0,
@@ -42,4 +42,26 @@ public class DataAccessLayer
             TextColor = Color.FromRgba(255, 255, 255, 255)
         }
     ];
+
+    public PlaylistVM[] Users { get; } =
+        Enumerable
+            .Range(0, 100)
+            .Select(i =>
+            {
+                var user = s_users[i % s_users.Length];
+
+                return new PlaylistVM
+                {
+                    Id = i,
+                    Name = $"[{i}] {user.Name}",
+                    Date = user.Date,
+                    Author = user.Author,
+                    AuthorPicture = user.AuthorPicture,
+                    Description = user.Description,
+                    Banner = user.Banner,
+                    BackgroundColor = user.BackgroundColor,
+                    TextColor = user.TextColor
+                };
+            })
+            .ToArray();
 }

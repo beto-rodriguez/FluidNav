@@ -52,6 +52,9 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 
         BindingContext = _dal.Users.First(u => u.Id == id);
 
+        _transitionView._downloadButton.IsVisible = true;
+        _transitionView._moreButton.IsVisible = true;
+
         _ = _transitionView.FlowToResult(v => v.CardViewFlow);
         _ = _transitionView._root.Flow(v => v.Flows().ToDouble(HeightRequestProperty, 650));
         _ = _transitionView._descriptionLabel.Flow(v => v.Flows().ToDouble(OpacityProperty, 1));

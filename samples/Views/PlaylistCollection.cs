@@ -13,6 +13,8 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
 
     public override View GetView()
     {
+        var uu = dal.Users;
+
         // the footer is a hack to get the CollectionView to scroll to the top always
         return new CollectionView()
         {
@@ -24,6 +26,9 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
             .ItemTemplate(new DataTemplate(() =>
             {
                 var transitionView = new PlaylistTransitionView();
+
+                transitionView._downloadButton.IsVisible = false;
+                transitionView._moreButton.IsVisible = false;
 
                 _ = transitionView
                     .TapGesture(async () =>

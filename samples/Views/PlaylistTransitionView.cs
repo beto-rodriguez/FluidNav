@@ -18,8 +18,8 @@ public class PlaylistTransitionView : ContentView
     private readonly HorizontalStackLayout _dataLayout = null!;
     public readonly Label _descriptionLabel = new() { MaximumWidthRequest = 360 };
     private readonly Button _addButton = new();
-    private readonly Button _downloadButton = new();
-    private readonly Button _moreButton = new();
+    public readonly Button _downloadButton = new();
+    public readonly Button _moreButton = new();
 
     public PlaylistTransitionView()
     {
