@@ -15,7 +15,7 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
     {
         // the footer is a hack to get the CollectionView to scroll to the top always
         return new CollectionView()
-            {
+        {
             Footer = new BoxView().Size(10, 1000).Background(Colors.Transparent),
             ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical) { ItemSpacing = 15 },
         }

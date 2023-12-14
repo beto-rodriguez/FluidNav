@@ -10,6 +10,7 @@ namespace Sample.Views;
 public class PlaylistTransitionView : ContentView
 {
     public AbsoluteLayout _root = null!;
+    private readonly Button _backButton = new();
     private readonly AvatarControl _avatar = new();
     private readonly Label _nameLabel = new();
     private readonly Label _dateLabel = new();
@@ -24,6 +25,20 @@ public class PlaylistTransitionView : ContentView
     {
         Content = new AbsoluteLayout()
         {
+            _backButton
+                .LayoutBounds(0, 0)
+                .LayoutFlags(AbsoluteLayoutFlags.PositionProportional)
+                .Style(ButtonStyle)
+                .Bind(
+                    BackgroundColorProperty,
+                    getter: (PlaylistVM vm) => vm.BackgroundColor)
+                .Bind(
+                    Button.TextColorProperty,
+                    getter: (PlaylistVM vm) => vm.TextColor)
+                .Size(40)
+                .Text("<")
+                .TapGesture(() => FlowNavigation.Current.GoBack()),
+
             _avatar
                 .LayoutFlags(AbsoluteLayoutFlags.PositionProportional)
                 .Bind(
@@ -221,6 +236,7 @@ public class PlaylistTransitionView : ContentView
 
         ListViewFlow = [
             _root.Flows().ToDouble(HeightRequestProperty, 500).ToDouble(MaximumWidthRequestProperty, 600),
+            _backButton.Flows().ToDouble(OpacityProperty, 0),
             _avatar.Flows().ToMargin(top: t1, left: l1).ToLayoutBounds(0, 0),
             _nameLabel.Flows().ToMargin(top: t1 + 5, left: l2).ToLayoutBounds(0, 0),
             _dateLabel.Flows().ToMargin(top: t1 + 30, left: l2).ToLayoutBounds(0, 0),
@@ -233,7 +249,8 @@ public class PlaylistTransitionView : ContentView
         ];
 
         CardViewFlow = [
-            _root.Flows().ToDouble(HeightRequestProperty, 500).ToDouble(MaximumWidthRequestProperty, 1900),
+            _root.Flows().ToDouble(HeightRequestProperty, 500).ToDouble(MaximumWidthRequestProperty, 2000),
+            _backButton.Flows().ToDouble(OpacityProperty, 1),
             _avatar.Flows().ToMargin(top: t1).ToLayoutBounds(0.5, 0),
             _nameLabel.Flows().ToMargin(top: t2).ToLayoutBounds(0.5, 0),
             _dateLabel.Flows().ToMargin(top: t2 + 25).ToLayoutBounds(0.5, 0),
