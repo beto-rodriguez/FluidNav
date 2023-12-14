@@ -20,8 +20,8 @@ public static class MauiProgram
                 .AddFont("icons.ttf", "Icons"))
             .UseFluidNav<FluidHostPage>(r => r
                 //.AddRoute<AbsoluteTest>()
-                .AddRoute<UsersCollection>()
-                .AddRoute<User, UserVM>());
+                .AddRoute<PlaylistCollection>()
+                .AddRoute<Playlist, PlaylistVM>());
 
         builder.Services
             .AddSingleton<ICommunityToolkitHotReloadHandler, HotReloadHandler>()

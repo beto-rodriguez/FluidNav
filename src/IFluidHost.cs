@@ -3,10 +3,10 @@
 /// <summary>
 /// Defines a fluid page.
 /// </summary>
-public interface IFluidPage
+public interface IFluidHost
 {
     /// <summary>
-    /// Gets the content presenter.
+    /// Shows the specified view, null to clear it.
     /// </summary>
-    ContentPresenter Presenter { get; }
+    void ShowView(View view);
 }

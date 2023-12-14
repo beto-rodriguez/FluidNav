@@ -57,8 +57,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Fonts\icons.ttf" />
 	  <None Remove="Resources\Fonts\Outfit-Regular.ttf" />
+	  <None Remove="Resources\Images\good_vives.png" />
+	  <None Remove="Resources\Images\guitar_player.png" />
+	  <None Remove="Resources\Images\sax_player.png" />
+	  <None Remove="Resources\Images\user_avatar.png" />
+	  <None Remove="Resources\Images\user_avatar_2.png" />
+	  <None Remove="Resources\Images\user_avatar_3.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -71,18 +76,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\src\FluidNav.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiXaml Update="FluidHostPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="FluidHostPage.xaml.cs">
-	    <DependentUpon>FluidHostPage.xaml</DependentUpon>
-	  </Compile>
 	</ItemGroup>
 
 </Project>

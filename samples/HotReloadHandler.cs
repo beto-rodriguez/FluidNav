@@ -23,7 +23,7 @@ public class HotReloadHandler : ICommunityToolkitHotReloadHandler
         {
             if (window.Page is not Page currentPage) return;
 
-            _ = currentPage.Dispatcher.Dispatch(Fluid.MainView.Refresh);
+            _ = currentPage.Dispatcher.Dispatch(FlowNavigation.Current.OnHotReloaded);
         }
     }
 }

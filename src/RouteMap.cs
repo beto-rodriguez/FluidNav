@@ -8,6 +8,11 @@ public class RouteMap(IServiceCollection services)
 {
     private readonly Dictionary<string, Type> _routes = [];
 
+    /// <summary>
+    /// Gets or sets the route type.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public Type this[string key]
     {
         get => _routes[key];

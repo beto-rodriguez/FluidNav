@@ -13,6 +13,8 @@ public static class FluidAnimationsExtensions
         if (property.ReturnType != typeof(double))
             throw new ArgumentException("Property flow error. Property must be of type double", nameof(property));
 
+        var a = (double)flow.VisualElement.GetValue(property);
+
         return flow.Add(
             new FlowProperty(
                 flow.VisualElement,
@@ -114,15 +116,56 @@ public static class FluidAnimationsExtensions
     /// Sets all the flow properties to their target values (without animations).
     /// </summary>
     /// <param name="view">The target view.</param>
+    /// <param name="flowBuilder">da flow builder.</param>
+    /// <returns></returns>
+    public static T FlowToResult<T>(this T view, Func<T, IEnumerable<Flow>> flowBuilder) where T : View
+    {
+        return view.FlowToResult(flowBuilder(view));
+    }
+
+    /// <summary>
+    /// Sets all the flow properties to their target values (without animations).
+    /// </summary>
+    /// <param name="view">The target view.</param>
+    /// <param name="flowBuilder">da flow builder.</param>
+    /// <returns></returns>
+    public static T FlowToResult<T>(this T view, Func<T, Flow> flowBuilder) where T : View
+    {
+        return view.FlowToResult([flowBuilder(view)]);
+    }
+
+    /// <summary>
+    /// Sets all the flow properties to their target values (without animations).
+    /// </summary>
+    /// <param name="view">The target view.</param>
     /// <param name="flowCollection">da flow.</param>
     /// <returns></returns>
-    public static View FlowToResult(this View view, IEnumerable<Flow> flowCollection)
+    public static T FlowToResult<T>(this T view, IEnumerable<Flow> flowCollection) where T : View
     {
         foreach (var flow in flowCollection)
             foreach (var flowProperty in flow)
                 flowProperty.Setter(flowProperty.TargetValue);
 
         return view;
+    }
+
+    /// <summary>
+    /// Starts a flow animation and returns a task that completes when the animation ends.
+    /// </summary>
+    /// <param name="view">The target view.</param>
+    /// <param name="flowBuilder">da flow builder.</param>
+    /// <param name="owner">Identifies the owner of the animation. This can be the visual element on which the animation is applied, or another visual element, such as the page</param>
+    /// <param name="duration">The duration in milliseconds.</param>
+    /// <param name="easing">The easing function.</param>
+    /// <param name="fps">Frames per second, default is 60.</param>
+    /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
+    /// <returns>A task that completes when the animations ends.</returns>
+    public static Task<bool> Flow<T>(
+        this T view, Func<T, Flow> flowBuilder, VisualElement? owner = null, uint duration = 500,
+        Easing? easing = null, uint fps = 60, string? animationName = null)
+            where T : View
+    {
+        return view.Flow([flowBuilder(view)], owner, duration, easing, fps, animationName);
     }
 
     /// <summary>
@@ -137,8 +180,8 @@ public static class FluidAnimationsExtensions
     /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
     /// <returns>A task that completes when the animations ends.</returns>
     public static Task<bool> Flow(
-        this View view, IEnumerable<Flow> flowCollection, VisualElement? owner = null, uint duration = 500,
-        Easing? easing = null, uint fps = 60, string? animationName = null)
+    this View view, IEnumerable<Flow> flowCollection, VisualElement? owner = null, uint duration = 500,
+    Easing? easing = null, uint fps = 60, string? animationName = null)
     {
         var parentAnimation = new Animation();
 
