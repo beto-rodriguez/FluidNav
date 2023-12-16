@@ -10,7 +10,7 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 {
     private readonly RouteParams _routeParams = routeParams;
     private readonly DataAccessLayer _dal = dal;
-    private PlaylistTransitionView _transitionView = null!;
+    public PlaylistTransitionView _transitionView = null!;
     private ScrollView _scrollView = null!;
 
     public override View GetView()
@@ -45,7 +45,7 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
         .Ref(out _scrollView);
     }
 
-    public override void OnEnter()
+    public override Task OnEnter()
     {
         var idParam = _routeParams["id"];
         var id = int.Parse(idParam);
@@ -55,13 +55,23 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
         _transitionView._downloadButton.IsVisible = true;
         _transitionView._moreButton.IsVisible = true;
 
-        _ = _transitionView.FlowToResult(v => v.CardViewFlow);
+        _ = _transitionView.FlowToResult(v => v.ListViewFlow);
+        _ = _transitionView.Flow(v => v.CardViewFlow);
+
+        _ = _transitionView.FlowToResult(v => v.Flows().ToMargin(left: v.StartPoint.X, top: v.StartPoint.Y));
+        _ = _transitionView.Flow(v => v.Flows().ToMargin(left: 0, top: 0));
+
         _ = _transitionView._root.Flow(v => v.Flows().ToDouble(HeightRequestProperty, 650));
         _ = _transitionView._descriptionLabel.Flow(v => v.Flows().ToDouble(OpacityProperty, 1));
+
+        return Task.CompletedTask;
     }
 
-    public override void OnLeave()
+    public override async Task OnLeave()
     {
+        _ = _transitionView.Flow(v => v.Flows().ToMargin(left: v.StartPoint.X, top: v.StartPoint.Y), duration: 100);
+        var a = await _transitionView.Flow(v => v.ListViewFlow, duration: 100);
+
         _ = _scrollView.ScrollToAsync(0, 0, false);
     }
 

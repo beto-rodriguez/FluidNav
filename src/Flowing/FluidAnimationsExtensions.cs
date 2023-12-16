@@ -161,6 +161,25 @@ public static class FluidAnimationsExtensions
     /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
     /// <returns>A task that completes when the animations ends.</returns>
     public static Task<bool> Flow<T>(
+        this T view, Func<T, IEnumerable<Flow>> flowBuilder, VisualElement? owner = null, uint duration = 500,
+        Easing? easing = null, uint fps = 60, string? animationName = null)
+            where T : View
+    {
+        return view.Flow(flowBuilder(view), owner, duration, easing, fps, animationName);
+    }
+
+    /// <summary>
+    /// Starts a flow animation and returns a task that completes when the animation ends.
+    /// </summary>
+    /// <param name="view">The target view.</param>
+    /// <param name="flowBuilder">da flow builder.</param>
+    /// <param name="owner">Identifies the owner of the animation. This can be the visual element on which the animation is applied, or another visual element, such as the page</param>
+    /// <param name="duration">The duration in milliseconds.</param>
+    /// <param name="easing">The easing function.</param>
+    /// <param name="fps">Frames per second, default is 60.</param>
+    /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
+    /// <returns>A task that completes when the animations ends.</returns>
+    public static Task<bool> Flow<T>(
         this T view, Func<T, Flow> flowBuilder, VisualElement? owner = null, uint duration = 500,
         Easing? easing = null, uint fps = 60, string? animationName = null)
             where T : View

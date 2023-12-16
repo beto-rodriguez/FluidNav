@@ -221,6 +221,7 @@ public class PlaylistTransitionView : ContentView
         DefineTransitions();
     }
 
+    public Point StartPoint { get; set; }
     public Flow[] ListViewFlow { get; set; } = [];
     public Flow[] CardViewFlow { get; set; } = [];
 

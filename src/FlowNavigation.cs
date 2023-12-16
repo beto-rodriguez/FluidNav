@@ -34,11 +34,34 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     public IFluidHost View { get; } = view;
 
     /// <summary>
+    /// Gets the view of the given type.
+    /// </summary>
+    /// <typeparam name="TView">The type of the view.</typeparam>
+    /// <returns>The view</returns>
+    public TView GetView<TView>() where TView : View
+    {
+        return (TView)GetView(typeof(TView).Name);
+    }
+
+    /// <summary>
+    /// Gets the view of the given route name.
+    /// </summary>
+    /// <param name="routeName">The route name.</param>
+    /// <returns>The view</returns>
+    public View GetView(string routeName)
+    {
+        var targetType = ActiveRoutes[routeName];
+
+        return (View?)_services.GetService(targetType) ??
+            throw new Exception($"View {targetType.Name} not found");
+    }
+
+    /// <summary>
     /// Navigates to the specified type.
     /// </summary>
     /// <typeparam name="TRoute">The type of the route.</typeparam>
     /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
-    public View GoTo<TRoute>(string? queryParams = null)
+    public Task<View> GoTo<TRoute>(string? queryParams = null)
     {
         return GoTo(typeof(TRoute).Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
     }
@@ -48,7 +71,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// </summary>
     /// <param name="type">The type of the route.</param>
     /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
-    public View GoTo(Type type, string? queryParams = null)
+    public Task<View> GoTo(Type type, string? queryParams = null)
     {
         return GoTo(type.Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
     }
@@ -57,7 +80,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// Navigates to the specified view type.
     /// </summary>
     /// <param name="route">The route.</param>
-    public View GoTo(string route)
+    public Task<View> GoTo(string route)
     {
         var routeName = route.Split('?')[0];
 
@@ -73,7 +96,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// <summary>
     /// Navigates back.
     /// </summary>
-    public View GoBack()
+    public Task<View> GoBack()
     {
         _activeIndex--;
         if (_activeIndex < 0) _activeIndex = 0;
@@ -84,7 +107,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// <summary>
     /// Navigates forward.
     /// </summary>
-    public View GoNext()
+    public Task<View> GoNext()
     {
         _activeIndex++;
         if (_activeIndex >= _navigationStack.Count) _activeIndex = _navigationStack.Count - 1;
@@ -100,7 +123,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         _ = Go(true);
     }
 
-    private View Go(bool isHotReload = false)
+    private async Task<View> Go(bool isHotReload = false)
     {
         var routeParts = _navigationStack[_activeIndex].Split('?');
 
@@ -116,7 +139,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         var view = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
-        _activeView?.OnLeave();
+        if (_activeView is not null) await _activeView.OnLeave();
         Current?.View.ShowView(view);
 
         if (view is FluidView fluidView)
@@ -133,7 +156,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                 }
             }
 
-            fluidView.OnEnter();
+            await fluidView.OnEnter();
             _activeView = fluidView;
         }
 

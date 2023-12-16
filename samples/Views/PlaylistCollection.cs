@@ -31,15 +31,13 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
                 transitionView._moreButton.IsVisible = false;
 
                 _ = transitionView
-                    .TapGesture(async () =>
+                    .OnTapped(p =>
                     {
                         _activeUserView = transitionView;
-
                         var user = (PlaylistVM)transitionView.BindingContext;
-                        _collectionView.ScrollTo(user, position: ScrollToPosition.Start);
-
-                        _ = await transitionView.Flow(transitionView.CardViewFlow);
-                        var resultView = FlowNavigation.Current.GoTo<Playlist>($"id={user.Id}");
+                        var v = FlowNavigation.Current.GetView<Playlist>();
+                        v._transitionView.StartPoint = p;
+                        _ = FlowNavigation.Current.GoTo<Playlist>($"id={user.Id}");
                     })
                     .FlowToResult(transitionView.ListViewFlow);
 
@@ -47,14 +45,16 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
             }));
     }
 
-    public override void OnEnter()
+    public override Task OnEnter()
     {
-        if (_activeUserView is null) return;
+        if (_activeUserView is null) return Task.CompletedTask;
         _ = _activeUserView.Flow(_activeUserView.ListViewFlow);
+
+        return Task.CompletedTask;
     }
 
-    public override void OnLeave()
+    public override Task OnLeave()
     {
-
+        return Task.CompletedTask;
     }
 }
