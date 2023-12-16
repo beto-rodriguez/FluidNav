@@ -67,4 +67,26 @@ public static class FlowExtensions
         border.Content = view;
         return border;
     }
+
+    /// <summary>
+    /// Calles an action when the view is tapped, and passes the coordinates of the element in the UI
+    /// relative to the Current FlowNavigation host.
+    /// </summary>
+    /// <param name="view"></param>
+    /// <param name="action"></param>
+    /// <returns></returns>
+    public static View OnTapped(this View view, Action<Point> action)
+    {
+        var tapGesture = new TapGestureRecognizer();
+
+        tapGesture.Tapped += (s, e) =>
+        {
+            var p = e.GetPosition((Page)FlowNavigation.Current.View);
+            action(new(p?.X ?? 0d, p?.Y ?? 0d));
+        };
+
+        view.GestureRecognizers.Add(tapGesture);
+
+        return view;
+    }
 }
