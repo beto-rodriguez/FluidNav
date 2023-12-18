@@ -24,14 +24,11 @@ public static class FlowExtensions
                 var host = (IFluidHost?)provider.GetService(typeof(THostView))
                     ?? throw new Exception($"Unable to find an {nameof(IFluidHost)} in the app.");
 
-                var instance = FlowNavigation.Current = new FlowNavigation(provider, host, map);
-
                 if (host is Page hostPage) NavigationPage.SetHasNavigationBar(hostPage, false);
-                if (map.DefaultRoute is null) throw new Exception("Default route not set");
 
-                _ = instance.GoTo(map.DefaultRoute);
-
-                return instance;
+                return map.DefaultRoute is null
+                    ? throw new Exception("Default route not set")
+                    : FlowNavigation.Current = new FlowNavigation(provider, host, map);
             })
             .AddSingleton(typeof(RouteParams));
 
@@ -75,17 +72,18 @@ public static class FlowExtensions
     /// <param name="view"></param>
     /// <param name="action"></param>
     /// <returns></returns>
-    public static View OnTapped(this View view, Action<Point> action)
+    public static View OnTapped(this ContentView view, Action<Point> action)
     {
         var tapGesture = new TapGestureRecognizer();
 
         tapGesture.Tapped += (s, e) =>
         {
-            var p1 = e.GetPosition(view);
-            var p2 = e.GetPosition((Page)FlowNavigation.Current.View);
-            if (p1 is null || p2 is null) return;
+            var p = e.GetPosition((Page)FlowNavigation.Current.View);
+            var p0 = e.GetPosition(view.Content);
 
-            action(new(p1.Value.X - p2.Value.X, p2.Value.Y - p1.Value.Y));
+            if (p is null || p0 is null) return;
+
+            action(new(p.Value.X - p0.Value.X, p.Value.Y - p0.Value.Y));
         };
 
         view.GestureRecognizers.Add(tapGesture);

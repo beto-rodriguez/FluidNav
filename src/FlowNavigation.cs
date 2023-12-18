@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using FluidNav.Flowing;
 
 namespace FluidNav;
 
@@ -16,7 +17,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     private readonly IServiceProvider _services = provider;
     private int _activeIndex;
     private List<string> _navigationStack = [];
-    private FluidView? _activeView;
+    private IFluidView? _activeView;
 
     /// <summary>
     /// Gets the main fluid page.
@@ -31,7 +32,15 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// <summary>
     /// Gets the view host.
     /// </summary>
-    public IFluidHost View { get; } = view;
+    public IFluidHost View { get; set; } = view;
+
+    public void Initialize(IFluidHost host)
+    {
+        Current.View = host;
+
+        _ = Current.GoTo(
+            Current.ActiveRoutes.DefaultRoute ?? throw new Exception("No default route was found."));
+    }
 
     /// <summary>
     /// Gets the view of the given type.
@@ -139,10 +148,25 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         var view = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
-        if (_activeView is not null) await _activeView.OnLeave();
+        if (_activeView is not null)
+        {
+            if (_activeView.TransitionView?.TransitionBounds is not null)
+            {
+                var tb = _activeView.TransitionView.TransitionBounds.Value;
+
+                _ = ((View)_activeView).Flow(v => v.Flows()
+                    .ToDouble(VisualElement.TranslationXProperty, tb.Left)
+                    .ToDouble(VisualElement.TranslationYProperty, tb.Top)
+                    .ToDouble(VisualElement.WidthRequestProperty, tb.Width)
+                    .ToDouble(VisualElement.HeightRequestProperty, tb.Height));
+            }
+
+            await _activeView.OnLeave();
+        }
+
         Current?.View.ShowView(view);
 
-        if (view is FluidView fluidView)
+        if (view is IFluidView fluidView)
         {
             if (isHotReload)
             {
@@ -154,6 +178,24 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                 {
                     Trace.WriteLine($"Failed to hot reload {fluidView.GetType().Name}: {ex.Message}");
                 }
+            }
+
+            if (fluidView.TransitionView?.TransitionBounds is not null)
+            {
+                var tb = fluidView.TransitionView.TransitionBounds.Value;
+
+                view.WidthRequest = tb.Width;
+                view.HeightRequest = tb.Height;
+                view.TranslationX = tb.X;
+                view.TranslationY = tb.Y;
+
+                var flowView = (Page?)Current?.View ?? throw new Exception("unable to get current view.");
+
+                _ = view.Flow(v => v.Flows()
+                    .ToDouble(VisualElement.TranslationXProperty, 0)
+                    .ToDouble(VisualElement.TranslationYProperty, 0)
+                    .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)
+                    .ToDouble(VisualElement.HeightRequestProperty, flowView.Height));
             }
 
             await fluidView.OnEnter();

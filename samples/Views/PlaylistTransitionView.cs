@@ -7,7 +7,7 @@ using FluidNav;
 
 namespace Sample.Views;
 
-public class PlaylistTransitionView : ContentView
+public class PlaylistTransitionView : TransitionView
 {
     public AbsoluteLayout _root = null!;
     private readonly Button _backButton = new();
@@ -221,7 +221,6 @@ public class PlaylistTransitionView : ContentView
         DefineTransitions();
     }
 
-    public Point StartPoint { get; set; }
     public Flow[] ListViewFlow { get; set; } = [];
     public Flow[] CardViewFlow { get; set; } = [];
 

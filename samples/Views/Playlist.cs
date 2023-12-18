@@ -6,11 +6,10 @@ using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace Sample.Views;
 
-public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
+public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView<PlaylistTransitionView>
 {
     private readonly RouteParams _routeParams = routeParams;
     private readonly DataAccessLayer _dal = dal;
-    public PlaylistTransitionView _transitionView = null!;
     private ScrollView _scrollView = null!;
 
     public override View GetView()
@@ -52,14 +51,11 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 
         BindingContext = _dal.Users.First(u => u.Id == id);
 
-        _transitionView._downloadButton.IsVisible = true;
-        _transitionView._moreButton.IsVisible = true;
-
         _ = _transitionView.FlowToResult(v => v.ListViewFlow);
         _ = _transitionView.Flow(v => v.CardViewFlow);
 
-        _ = _transitionView.FlowToResult(v => v.Flows().ToMargin(left: v.StartPoint.X, top: v.StartPoint.Y));
-        _ = _transitionView.Flow(v => v.Flows().ToMargin(left: 0, top: 0));
+        _transitionView._downloadButton.IsVisible = true;
+        _transitionView._moreButton.IsVisible = true;
 
         _ = _transitionView._root.Flow(v => v.Flows().ToDouble(HeightRequestProperty, 650));
         _ = _transitionView._descriptionLabel.Flow(v => v.Flows().ToDouble(OpacityProperty, 1));
@@ -69,8 +65,7 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 
     public override async Task OnLeave()
     {
-        _ = _transitionView.Flow(v => v.Flows().ToMargin(left: v.StartPoint.X, top: v.StartPoint.Y), duration: 100);
-        var a = await _transitionView.Flow(v => v.ListViewFlow, duration: 100);
+        _ = await _transitionView.Flow(v => v.ListViewFlow);
 
         _ = _scrollView.ScrollToAsync(0, 0, false);
     }

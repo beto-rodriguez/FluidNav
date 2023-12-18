@@ -6,6 +6,16 @@
 public interface IFluidHost
 {
     /// <summary>
+    /// Gets the width.
+    /// </summary>
+    double Width { get; }
+
+    /// <summary>
+    /// Gets the height.
+    /// </summary>
+    double Height { get; }
+
+    /// <summary>
     /// Shows the specified view, null to clear it.
     /// </summary>
     void ShowView(View view);
