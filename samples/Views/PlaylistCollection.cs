@@ -7,9 +7,6 @@ namespace Sample.Views;
 
 public class PlaylistCollection(DataAccessLayer dal) : FluidView
 {
-    private PlaylistTransitionView? _activeUserView;
-    private CollectionView _collectionView = new();
-
     public override View GetView()
     {
         // the footer is a hack to get the CollectionView to scroll to the top always
@@ -28,36 +25,12 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
                     VerticalItemSpacing = 10
                 }
         }
-        .Ref(out _collectionView)
         .ItemsSource(dal.Users)
-        .ItemTemplate(new DataTemplate(() =>
-        {
-            var transitionView = new PlaylistTransitionView();
-
-            transitionView._downloadButton.IsVisible = false;
-            transitionView._moreButton.IsVisible = false;
-
-            _ = transitionView
-                .OnTapped(p =>
-                {
-                    _activeUserView = transitionView;
-                    FlowNavigation.Current.GetView<Playlist>().TransitionView.TransitionBounds = new(
-                        p.X, p.Y, transitionView.Content.Width, transitionView.Content.Height);
-                    transitionView.Opacity = 0;
-
-                    var user = (PlaylistVM)transitionView.BindingContext;
-                    _ = FlowNavigation.Current.GoTo<Playlist>($"id={user.Id}");
-                })
-                .FlowToResult<PlaylistCollection>();
-
-            return transitionView;
-        }));
-    }
-
-    public override void OnEntering()
-    {
-        if (_activeUserView is null) return;
-        //_activeUserView.Opacity = 1;
-        //_ = await _activeUserView.Flow<PlaylistCollection>();
+        .ItemTemplate(
+            TransitionView.Navigate<PlaylistCollection, Playlist, PlaylistTransitionView>(item =>
+            {
+                var user = (PlaylistVM)item;    // <- the item source
+                return $"id={user.Id}";         // <- the route params
+            }));
     }
 }

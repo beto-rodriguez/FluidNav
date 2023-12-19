@@ -37,4 +37,43 @@ public abstract class TransitionView : ContentView
     {
         return this.Flow(_flows[type]);
     }
+
+    /// <summary>
+    /// Gets a template that animates the transition between two views.
+    /// </summary>
+    /// <typeparam name="TFromView">The type of the view that starts the navigation.</typeparam>
+    /// <typeparam name="TToView">The type of the view where the navigation ends.</typeparam>
+    /// <typeparam name="TTransitionView">The type of the transition view.</typeparam>
+    /// <returns>The data template.</returns>
+    public static DataTemplate Navigate<TFromView, TToView, TTransitionView>(
+        Func<object, string>? routeParamsBuilder = null)
+            where TTransitionView : TransitionView, new()
+            where TFromView : FluidView
+            where TToView : FluidView
+    {
+        return new DataTemplate(() =>
+        {
+            var transitionView = new TTransitionView();
+
+            _ = transitionView
+                .OnTapped(p =>
+                {
+                    var tv = FlowNavigation.Current.GetView<TToView>().TransitionView;
+
+                    if (tv is not null)
+                    {
+                        tv.TransitionBounds = new(
+                            p.X,
+                            p.Y,
+                            transitionView.Content.Width,
+                            transitionView.Content.Height);
+                    }
+
+                    _ = FlowNavigation.Current.GoTo<TToView>(routeParamsBuilder?.Invoke(transitionView.BindingContext));
+                })
+                .FlowToResult<TFromView>();
+
+            return transitionView;
+        });
+    }
 }

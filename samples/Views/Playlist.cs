@@ -17,7 +17,7 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
         {
             Content = new VerticalStackLayout()
             {
-                new PlaylistTransitionView().Ref(out _transitionView),
+                UseAsTransition(new PlaylistTransitionView()),
 
                 new VerticalStackLayout()
                 {
