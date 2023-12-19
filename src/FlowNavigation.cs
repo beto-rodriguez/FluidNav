@@ -226,11 +226,6 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             _activeView = fluidView;
         }
 
-        if (previousView is not null)
-        {
-            Current?.View.RemoveView(previousView);
-        }
-
         return view;
     }
 }
