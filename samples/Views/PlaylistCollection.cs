@@ -49,7 +49,7 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView<PlaylistTransit
                     var user = (PlaylistVM)transitionView.BindingContext;
                     _ = FlowNavigation.Current.GoTo<Playlist>($"id={user.Id}");
                 })
-                .FlowToResult(transitionView.ListViewFlow);
+                .FlowToResult<PlaylistCollection>();
 
             return transitionView;
         }));
@@ -59,7 +59,7 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView<PlaylistTransit
     {
         if (_activeUserView is null) return;
         _activeUserView.Opacity = 1;
-        _ = await _activeUserView.Flow(_activeUserView.ListViewFlow);
+        _ = await _activeUserView.Flow<PlaylistCollection>();
     }
 
     public override Task OnLeave()

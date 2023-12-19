@@ -218,14 +218,6 @@ public class PlaylistTransitionView : TransitionView
             BackgroundColorProperty,
             getter: (PlaylistVM vm) => vm.BackgroundColor);
 
-        DefineTransitions();
-    }
-
-    public Flow[] ListViewFlow { get; set; } = [];
-    public Flow[] CardViewFlow { get; set; } = [];
-
-    public void DefineTransitions()
-    {
         var l1 = 25;
         var l2 = 95;
 
@@ -234,7 +226,7 @@ public class PlaylistTransitionView : TransitionView
         var t1 = 25;
         var t2 = 100;
 
-        ListViewFlow = [
+        HasTransitionState<PlaylistCollection>(
             _root.Flows().ToDouble(HeightRequestProperty, 500).ToDouble(MaximumWidthRequestProperty, 600),
             _backButton.Flows().ToDouble(OpacityProperty, 0),
             _avatar.Flows().ToMargin(top: t1, left: l1).ToLayoutBounds(0, 0),
@@ -245,10 +237,9 @@ public class PlaylistTransitionView : TransitionView
             _dataLayout.Flows().ToMargin(top: t2 + 60).ToLayoutBounds(0.5, 0),
             _descriptionLabel.Flows().ToDouble(OpacityProperty, 0),
             _downloadButton.Flows().ToDouble(OpacityProperty, 0),
-            _moreButton.Flows().ToDouble(OpacityProperty, 0)
-        ];
+            _moreButton.Flows().ToDouble(OpacityProperty, 0));
 
-        CardViewFlow = [
+        HasTransitionState<Playlist>(
             _root.Flows().ToDouble(HeightRequestProperty, 500).ToDouble(MaximumWidthRequestProperty, 2000),
             _backButton.Flows().ToDouble(OpacityProperty, 1),
             _avatar.Flows().ToMargin(top: t1).ToLayoutBounds(0.5, 0),
@@ -259,8 +250,7 @@ public class PlaylistTransitionView : TransitionView
             _dataLayout.Flows().ToMargin(top: t2 + 120).ToLayoutBounds(0.5, 0),
             _descriptionLabel.Flows().ToMargin(top: 20).ToDouble(OpacityProperty, 0),
             _downloadButton.Flows().ToDouble(OpacityProperty, 1),
-            _moreButton.Flows().ToDouble(OpacityProperty, 1)
-        ];
+            _moreButton.Flows().ToDouble(OpacityProperty, 1));
     }
 
     public Style<Button> ButtonStyle => new Style<Button>()

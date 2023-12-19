@@ -51,8 +51,9 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView<
 
         BindingContext = _dal.Users.First(u => u.Id == id);
 
-        _ = _transitionView.FlowToResult(v => v.ListViewFlow);
-        _ = _transitionView.Flow(v => v.CardViewFlow);
+
+        _ = _transitionView.FlowToResult<PlaylistCollection>();
+        _ = _transitionView.Flow<Playlist>();
 
         _transitionView._downloadButton.IsVisible = true;
         _transitionView._moreButton.IsVisible = true;
@@ -65,7 +66,7 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView<
 
     public override async Task OnLeave()
     {
-        _ = await _transitionView.Flow(v => v.ListViewFlow);
+        _ = await _transitionView.Flow<PlaylistCollection>();
 
         _ = _scrollView.ScrollToAsync(0, 0, false);
     }

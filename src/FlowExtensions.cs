@@ -72,7 +72,7 @@ public static class FlowExtensions
     /// <param name="view"></param>
     /// <param name="action"></param>
     /// <returns></returns>
-    public static View OnTapped(this ContentView view, Action<Point> action)
+    public static T OnTapped<T>(this T view, Action<Point> action) where T : ContentView
     {
         var tapGesture = new TapGestureRecognizer();
 
