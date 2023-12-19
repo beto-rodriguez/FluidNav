@@ -17,7 +17,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     private readonly IServiceProvider _services = provider;
     private int _activeIndex;
     private List<string> _navigationStack = [];
-    private IFluidView? _activeView;
+    private FluidView? _activeView;
 
     /// <summary>
     /// Gets the main fluid page.
@@ -150,23 +150,25 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
         if (_activeView is not null)
         {
+            _activeView.OnLeaving();
+
             if (_activeView.TransitionView?.TransitionBounds is not null)
             {
-                var tb = _activeView.TransitionView.TransitionBounds.Value;
+                var tb = _activeView.TransitionView.TransitionBounds;
 
                 _ = ((View)_activeView).Flow(v => v.Flows()
                     .ToDouble(VisualElement.TranslationXProperty, tb.Left)
                     .ToDouble(VisualElement.TranslationYProperty, tb.Top)
                     .ToDouble(VisualElement.WidthRequestProperty, tb.Width)
                     .ToDouble(VisualElement.HeightRequestProperty, tb.Height));
-            }
 
-            await _activeView.OnLeave();
+                _ = await _activeView.TransitionView.Flow(targetType);
+            }
         }
 
         Current?.View.ShowView(view);
 
-        if (view is IFluidView fluidView)
+        if (view is FluidView fluidView)
         {
             if (isHotReload)
             {
@@ -180,9 +182,11 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                 }
             }
 
-            if (fluidView.TransitionView?.TransitionBounds is not null)
+            fluidView.OnEntering();
+
+            if (fluidView.TransitionView is not null)
             {
-                var tb = fluidView.TransitionView.TransitionBounds.Value;
+                var tb = fluidView.TransitionView.TransitionBounds;
 
                 view.WidthRequest = tb.Width;
                 view.HeightRequest = tb.Height;
@@ -196,9 +200,17 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                     .ToDouble(VisualElement.TranslationYProperty, 0)
                     .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)
                     .ToDouble(VisualElement.HeightRequestProperty, flowView.Height));
+
+                if (_activeIndex > 0)
+                {
+                    var previousRouteName = _navigationStack[_activeIndex - 1].Split('?');
+                    var previousRouteType = ActiveRoutes[previousRouteName[0]];
+
+                    _ = fluidView.TransitionView.FlowToResult(previousRouteType);
+                    _ = await fluidView.TransitionView.Flow(targetType);
+                }
             }
 
-            await fluidView.OnEnter();
             _activeView = fluidView;
         }
 

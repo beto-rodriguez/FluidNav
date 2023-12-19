@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using FluidNav;
-using FluidNav.Flowing;
 using Sample.Data;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace Sample.Views;
 
-public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView<PlaylistTransitionView>
+public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 {
     private readonly RouteParams _routeParams = routeParams;
     private readonly DataAccessLayer _dal = dal;
@@ -44,29 +43,12 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView<
         .Ref(out _scrollView);
     }
 
-    public override Task OnEnter()
+    public override void OnEntering()
     {
         var idParam = _routeParams["id"];
         var id = int.Parse(idParam);
 
         BindingContext = _dal.Users.First(u => u.Id == id);
-
-
-        _ = _transitionView.FlowToResult<PlaylistCollection>();
-        _ = _transitionView.Flow<Playlist>();
-
-        _transitionView._downloadButton.IsVisible = true;
-        _transitionView._moreButton.IsVisible = true;
-
-        _ = _transitionView._root.Flow(v => v.Flows().ToDouble(HeightRequestProperty, 650));
-        _ = _transitionView._descriptionLabel.Flow(v => v.Flows().ToDouble(OpacityProperty, 1));
-
-        return Task.CompletedTask;
-    }
-
-    public override async Task OnLeave()
-    {
-        _ = await _transitionView.Flow<PlaylistCollection>();
 
         _ = _scrollView.ScrollToAsync(0, 0, false);
     }

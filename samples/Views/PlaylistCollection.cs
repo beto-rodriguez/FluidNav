@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using FluidNav;
-using FluidNav.Flowing;
 using Sample.Data;
 using Sample.ViewModels;
 
 namespace Sample.Views;
 
-public class PlaylistCollection(DataAccessLayer dal) : FluidView<PlaylistTransitionView>
+public class PlaylistCollection(DataAccessLayer dal) : FluidView
 {
     private PlaylistTransitionView? _activeUserView;
     private CollectionView _collectionView = new();
@@ -55,15 +54,10 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView<PlaylistTransit
         }));
     }
 
-    public override async Task OnEnter()
+    public override void OnEntering()
     {
         if (_activeUserView is null) return;
-        _activeUserView.Opacity = 1;
-        _ = await _activeUserView.Flow<PlaylistCollection>();
-    }
-
-    public override Task OnLeave()
-    {
-        return Task.CompletedTask;
+        //_activeUserView.Opacity = 1;
+        //_ = await _activeUserView.Flow<PlaylistCollection>();
     }
 }
