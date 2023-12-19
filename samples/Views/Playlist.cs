@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Core.Platform;
+using CommunityToolkit.Maui.Markup;
 using FluidNav;
 using Sample.Data;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -48,7 +50,12 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
         var idParam = _routeParams["id"];
         var id = int.Parse(idParam);
 
-        BindingContext = _dal.Users.First(u => u.Id == id);
+        var user = _dal.Users.First(u => u.Id == id);
+
+        BindingContext = user;
+
+        StatusBar.SetColor(user.BackgroundColor);
+        StatusBar.SetStyle(StatusBarStyle.LightContent);
 
         _ = _scrollView.ScrollToAsync(0, 0, false);
     }

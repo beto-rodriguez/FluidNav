@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Core.Platform;
+using CommunityToolkit.Maui.Markup;
 using FluidNav;
 using Sample.Data;
 using Sample.ViewModels;
@@ -30,5 +32,11 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
                 var user = (PlaylistVM)item;    // <- the item source
                 return $"id={user.Id}";         // <- the route params
             }));
+    }
+
+    public override void OnEntering()
+    {
+        StatusBar.SetColor(Colors.White);
+        StatusBar.SetStyle(StatusBarStyle.DarkContent);
     }
 }

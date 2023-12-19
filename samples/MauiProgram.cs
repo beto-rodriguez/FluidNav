@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Markup;
 using FluidNav;
 using Microsoft.Extensions.Logging;
 using Sample.Data;
@@ -14,6 +15,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .UseMauiCommunityToolkitMarkup()
             .ConfigureFonts(fonts => fonts
                 .AddFont("Outfit-Regular.ttf", "Outfit")
