@@ -16,7 +16,7 @@ public interface IFluidHost
     double Height { get; }
 
     /// <summary>
-    /// Shows the specified view, null to clear it.
+    /// Shows the specified view.
     /// </summary>
     void ShowView(View view);
 }

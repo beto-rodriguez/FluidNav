@@ -5,6 +5,7 @@ namespace Sample;
 
 public class FluidHostPage : ContentPage, IFluidHost
 {
+    private int _zIndex = 0;
     private View? _currentView;
     private readonly AbsoluteLayout _root = [];
 
@@ -17,15 +18,11 @@ public class FluidHostPage : ContentPage, IFluidHost
 
     }
 
-    private int _zIndex = 0;
-
     public void ShowView(View view)
     {
-        //_ = _root.Children.Remove(_currentView);
-
         view.ZIndex = _zIndex++;
         view.WidthRequest = Width;
-        view.HeightRequest = Width;
+        view.HeightRequest = Height;
 
         _currentView = view;
 

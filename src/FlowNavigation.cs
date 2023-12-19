@@ -148,6 +148,20 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         var view = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
+        _ = view.FadeTo(1);
+
+        string? previousRouteName = null;
+        Type? previousRouteType = null;
+        View? previousView = null;
+
+        if (_activeIndex > 0)
+        {
+            previousRouteName = _navigationStack[_activeIndex - 1].Split('?')[0];
+            previousRouteType = ActiveRoutes[previousRouteName];
+            previousView = (View?)_services.GetService(previousRouteType) ??
+                throw new Exception($"View {previousRouteType.Name} not found");
+        }
+
         if (_activeView is not null)
         {
             _activeView.OnLeaving();
@@ -166,6 +180,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             }
         }
 
+        _ = (previousView?.FadeTo(0));
         Current?.View.ShowView(view);
 
         if (view is FluidView fluidView)
@@ -201,17 +216,19 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                     .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)
                     .ToDouble(VisualElement.HeightRequestProperty, flowView.Height));
 
-                if (_activeIndex > 0)
+                if (previousRouteType is not null)
                 {
-                    var previousRouteName = _navigationStack[_activeIndex - 1].Split('?');
-                    var previousRouteType = ActiveRoutes[previousRouteName[0]];
-
                     _ = fluidView.TransitionView.FlowToResult(previousRouteType);
                     _ = await fluidView.TransitionView.Flow(targetType);
                 }
             }
 
             _activeView = fluidView;
+        }
+
+        if (previousView is not null)
+        {
+            Current?.View.RemoveView(previousView);
         }
 
         return view;
