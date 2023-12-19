@@ -15,8 +15,9 @@ namespace FluidNav;
 public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap map)
 {
     private readonly IServiceProvider _services = provider;
-    private int _activeIndex;
     private List<string> _navigationStack = [];
+    private int _activeIndex;
+    private Type? _activeViewType;
     private FluidView? _activeView;
 
     /// <summary>
@@ -150,18 +151,6 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
         _ = view.FadeTo(1);
 
-        string? previousRouteName = null;
-        Type? previousRouteType = null;
-        View? previousView = null;
-
-        if (_activeIndex > 0)
-        {
-            previousRouteName = _navigationStack[_activeIndex - 1].Split('?')[0];
-            previousRouteType = ActiveRoutes[previousRouteName];
-            previousView = (View?)_services.GetService(previousRouteType) ??
-                throw new Exception($"View {previousRouteType.Name} not found");
-        }
-
         if (_activeView is not null)
         {
             _activeView.OnLeaving();
@@ -180,7 +169,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             }
         }
 
-        _ = (previousView?.FadeTo(0));
+        _ = (_activeView?.FadeTo(0));
         Current?.View.ShowView(view);
 
         if (view is FluidView fluidView)
@@ -216,13 +205,14 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                     .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)
                     .ToDouble(VisualElement.HeightRequestProperty, flowView.Height));
 
-                if (previousRouteType is not null)
+                if (_activeViewType is not null)
                 {
-                    _ = fluidView.TransitionView.FlowToResult(previousRouteType);
+                    _ = fluidView.TransitionView.FlowToResult(_activeViewType);
                     _ = await fluidView.TransitionView.Flow(targetType);
                 }
             }
 
+            _activeViewType = targetType;
             _activeView = fluidView;
         }
 
