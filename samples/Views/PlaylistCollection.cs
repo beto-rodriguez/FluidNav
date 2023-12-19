@@ -9,10 +9,8 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
 {
     public override View GetView()
     {
-        // the footer is a hack to get the CollectionView to scroll to the top always
         return new CollectionView()
         {
-            Footer = new BoxView().Size(10, 1000).Background(Colors.Transparent),
             ItemsLayout = DeviceInfo.Idiom == DeviceIdiom.Phone
                 ? new LinearItemsLayout(ItemsLayoutOrientation.Vertical)
                 {
