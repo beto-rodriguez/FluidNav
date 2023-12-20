@@ -45,7 +45,7 @@ public abstract class TransitionView : ContentView
     /// <typeparam name="TToView">The type of the view where the navigation ends.</typeparam>
     /// <typeparam name="TTransitionView">The type of the transition view.</typeparam>
     /// <returns>The data template.</returns>
-    public static DataTemplate Navigate<TFromView, TToView, TTransitionView>(
+    public static DataTemplate Build<TFromView, TToView, TTransitionView>(
         Func<object, string>? routeParamsBuilder = null)
             where TTransitionView : TransitionView, new()
             where TFromView : FluidView

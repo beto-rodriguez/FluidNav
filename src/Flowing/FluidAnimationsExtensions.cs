@@ -2,6 +2,28 @@
 
 public static class FluidAnimationsExtensions
 {
+    public static Flow Flows(this VisualElement element, params (BindableProperty, object value)[] values)
+    {
+        var flow = new Flow(element);
+
+        foreach (var (property, value) in values)
+        {
+            if (property.ReturnType == typeof(double))
+                _ = flow.ToDouble(property, (double)value);
+            else if (property.ReturnType == typeof(Thickness))
+                _ = flow.ToThickness(property, (Thickness)value);
+            else if (property.ReturnType == typeof(Color))
+                _ = flow.ToColor(property, (Color)value);
+            else if (property.ReturnType == typeof(Rect))
+                _ = flow.ToLayoutBounds(((Rect)value).X, ((Rect)value).Y, ((Rect)value).Width, ((Rect)value).Height);
+            else
+                throw new ArgumentException(
+                    "Property flow error. Property must be of type double, Thickness, Color or Rect", nameof(property));
+        }
+
+        return flow;
+    }
+
     public static Flow Flows(this VisualElement element)
     {
         return new Flow(element);
@@ -32,16 +54,20 @@ public static class FluidAnimationsExtensions
     public static Flow ToMargin(
         this Flow flow, double left = 0, double top = 0, double right = 0, double bottom = 0, double start = 0, double end = 1)
     {
-        return flow.ToThickness(View.MarginProperty, left, top, right, bottom, start, end);
+        return flow.ToThickness(View.MarginProperty, new Thickness(left, top, right, bottom), start, end);
     }
 
     public static Flow ToThickness(
         this Flow flow, BindableProperty property, double left = 0, double top = 0, double right = 0, double bottom = 0, double start = 0, double end = 1)
     {
+        return flow.ToThickness(View.MarginProperty, new Thickness(left, top, right, bottom), start, end);
+    }
+
+    public static Flow ToThickness(
+        this Flow flow, BindableProperty property, Thickness value, double start = 0, double end = 1)
+    {
         if (property.ReturnType != typeof(Thickness))
             throw new ArgumentException("Property flow error. Property must be of type Thickness", nameof(property));
-
-        var value = new Thickness(left, top, right, bottom);
 
         return flow.Add(
             new FlowProperty(

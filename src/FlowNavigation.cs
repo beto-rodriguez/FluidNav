@@ -146,10 +146,10 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
         var targetType = ActiveRoutes[routeName];
 
-        var view = (View?)_services.GetService(targetType) ??
+        var nextView = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
-        _ = view.FadeTo(1);
+        _ = nextView.FadeTo(1);
 
         if (_activeView is not null)
         {
@@ -169,37 +169,26 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             }
         }
 
-        _ = (_activeView?.FadeTo(0));
-        Current?.View.ShowView(view);
+        if (!isHotReload) _ = (_activeView?.FadeTo(0));
+        Current?.View.ShowView(nextView);
 
-        if (view is FluidView fluidView)
+        if (nextView is FluidView fluidView)
         {
-            if (isHotReload)
-            {
-                try
-                {
-                    fluidView.Content = fluidView.GetView();
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine($"Failed to hot reload {fluidView.GetType().Name}: {ex.Message}");
-                }
-            }
-
             fluidView.OnEntering();
+            fluidView.Content = fluidView.GetView();
 
             if (fluidView.TransitionView is not null)
             {
                 var tb = fluidView.TransitionView.TransitionBounds;
 
-                view.WidthRequest = tb.Width;
-                view.HeightRequest = tb.Height;
-                view.TranslationX = tb.X;
-                view.TranslationY = tb.Y;
+                nextView.WidthRequest = tb.Width;
+                nextView.HeightRequest = tb.Height;
+                nextView.TranslationX = tb.X;
+                nextView.TranslationY = tb.Y;
 
                 var flowView = (Page?)Current?.View ?? throw new Exception("unable to get current view.");
 
-                _ = view.Flow(v => v.Flows()
+                _ = nextView.Flow(v => v.Flows()
                     .ToDouble(VisualElement.TranslationXProperty, 0)
                     .ToDouble(VisualElement.TranslationYProperty, 0)
                     .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)
@@ -216,6 +205,6 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             _activeView = fluidView;
         }
 
-        return view;
+        return nextView;
     }
 }

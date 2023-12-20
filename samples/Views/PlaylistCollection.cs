@@ -27,7 +27,7 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
         }
         .ItemsSource(dal.Users)
         .ItemTemplate(
-            TransitionView.Navigate<PlaylistCollection, Playlist, PlaylistTransitionView>(item =>
+            TransitionView.Build<PlaylistCollection, Playlist, PlaylistTransitionView>(item =>
             {
                 var user = (PlaylistVM)item;    // <- the item source
                 return $"id={user.Id}";         // <- the route params

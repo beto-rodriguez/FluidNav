@@ -2,11 +2,6 @@
 
 public abstract class FluidView : ContentView
 {
-    public FluidView()
-    {
-        Content = GetView();
-    }
-
     public TransitionView? TransitionView { get; private set; }
 
     public abstract View GetView();
