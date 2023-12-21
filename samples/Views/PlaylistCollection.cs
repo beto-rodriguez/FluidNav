@@ -36,7 +36,9 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
 
     public override void OnEntering()
     {
+#if !WINDOWS
         StatusBar.SetColor(Colors.White);
         StatusBar.SetStyle(StatusBarStyle.DarkContent);
+#endif
     }
 }

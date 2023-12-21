@@ -174,8 +174,19 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
         if (nextView is FluidView fluidView)
         {
+            if (isHotReload)
+            {
+                try
+                {
+                    fluidView.Content = fluidView.GetView();
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"Failed to hot reload {fluidView.GetType().Name}: {ex.Message}");
+                }
+            }
+
             fluidView.OnEntering();
-            fluidView.Content = fluidView.GetView();
 
             if (fluidView.TransitionView is not null)
             {

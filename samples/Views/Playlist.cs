@@ -54,8 +54,10 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 
         BindingContext = user;
 
+#if !WINDOWS
         StatusBar.SetColor(user.BackgroundColor);
         StatusBar.SetStyle(StatusBarStyle.LightContent);
+#endif
 
         _ = _scrollView.ScrollToAsync(0, 0, false);
     }
