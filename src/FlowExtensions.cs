@@ -78,7 +78,7 @@ public static class FlowExtensions
 
         tapGesture.Tapped += (s, e) =>
         {
-            var p = e.GetPosition((Page)FlowNavigation.Current.View);
+            var p = e.GetPosition(FlowNavigation.Current.View.Presenter);
             var p0 = e.GetPosition(view.Content);
 
             if (p is null || p0 is null) return;

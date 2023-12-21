@@ -16,6 +16,11 @@ public interface IFluidHost
     double Height { get; }
 
     /// <summary>
+    /// Gets the presenter.
+    /// </summary>
+    View Presenter { get; }
+
+    /// <summary>
     /// Shows the specified view.
     /// </summary>
     void ShowView(View view);
