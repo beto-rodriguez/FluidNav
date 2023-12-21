@@ -150,7 +150,9 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             throw new Exception($"View {targetType.Name} not found");
 
         nextView.IsVisible = true;
-        _ = nextView.FadeTo(1, 500);
+        // if we don't call the animations api it seems that the view is not visible for a reason.
+        //nextView.Opacity = 1;
+        _ = nextView.FadeTo(1, 1);
 
         if (_activeView is not null)
         {

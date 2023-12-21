@@ -200,9 +200,9 @@ public static class FluidAnimationsExtensions
     /// </summary>
     /// <param name="flow">da flow.</param>
     /// <returns></returns>
-    public static T Complete<T>(this Flow flow) where T : View
+    public static View Complete<T>(this Flow flow)
     {
-        return (T)flow.View.Complete([flow]);
+        return flow.View.Complete([flow]);
     }
 
     /// <summary>
@@ -268,10 +268,9 @@ public static class FluidAnimationsExtensions
     /// <param name="fps">Frames per second, default is 60.</param>
     /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
     /// <returns>A task that completes when the animations ends.</returns>
-    public static Task<bool> Animate<T>(
+    public static Task<bool> Animate(
         this Flow flow, VisualElement? owner = null, uint duration = 500,
         Easing? easing = null, uint fps = 60, string? animationName = null)
-            where T : View
     {
         return flow.View.Animate([flow], owner, duration, easing, fps, animationName);
     }
