@@ -149,7 +149,8 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         var nextView = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
-        _ = nextView.FadeTo(1);
+        nextView.IsVisible = true;
+        _ = nextView.FadeTo(1, 500);
 
         if (_activeView is not null)
         {
@@ -169,7 +170,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             }
         }
 
-        if (!isHotReload) _ = (_activeView?.FadeTo(0));
+        if (!isHotReload) _ = (_activeView?.FadeTo(0, 500));
         Current?.View.ShowView(nextView);
 
         if (nextView is FluidView fluidView)
@@ -213,6 +214,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             }
 
             _activeViewType = targetType;
+            if (_activeView is not null) _activeView.IsVisible = false;
             _activeView = fluidView;
         }
 
