@@ -2,11 +2,11 @@
 
 namespace FluidNav.Flowing;
 
-public class Flow(VisualElement visual) : IEnumerable<FlowProperty>
+public class Flow(View view) : IEnumerable<FlowProperty>
 {
     private readonly List<FlowProperty> _flowProperties = [];
 
-    public VisualElement VisualElement { get; } = visual;
+    public View View { get; } = view;
 
     public Flow Add(FlowProperty flowProperty)
     {

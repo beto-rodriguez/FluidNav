@@ -159,7 +159,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             {
                 var tb = _activeView.TransitionView.TransitionBounds;
 
-                _ = ((View)_activeView).Flow(v => v.Flows()
+                _ = ((View)_activeView).Animate(v => v.Flows()
                     .ToDouble(VisualElement.TranslationXProperty, tb.Left)
                     .ToDouble(VisualElement.TranslationYProperty, tb.Top)
                     .ToDouble(VisualElement.WidthRequestProperty, tb.Width)
@@ -199,7 +199,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
                 var flowView = (Page?)Current?.View ?? throw new Exception("unable to get current view.");
 
-                _ = nextView.Flow(v => v.Flows()
+                _ = nextView.Animate(v => v.Flows()
                     .ToDouble(VisualElement.TranslationXProperty, 0)
                     .ToDouble(VisualElement.TranslationYProperty, 0)
                     .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)

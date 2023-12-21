@@ -20,22 +20,22 @@ public abstract class TransitionView : ContentView
 
     public TransitionView FlowToResult<TView>()
     {
-        return this.FlowToResult(_flows[typeof(TView)]);
+        return this.Complete(_flows[typeof(TView)]);
     }
 
     public TransitionView FlowToResult(Type type)
     {
-        return this.FlowToResult(_flows[type]);
+        return this.Complete(_flows[type]);
     }
 
     public Task<bool> Flow<TView>()
     {
-        return this.Flow(_flows[typeof(TView)]);
+        return this.Animate(_flows[typeof(TView)]);
     }
 
     public Task<bool> Flow(Type type)
     {
-        return this.Flow(_flows[type]);
+        return this.Animate(_flows[type]);
     }
 
     /// <summary>

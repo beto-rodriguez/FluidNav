@@ -34,30 +34,70 @@ public class PlaylistTransitionView : TransitionView
         var t2 = 100;
 
         HasTransitionState<PlaylistCollection>(
-            _root.Flows().ToDouble(HeightRequestProperty, 500).ToDouble(MaximumWidthRequestProperty, 600),
-            _backButton.Flows().ToDouble(OpacityProperty, 0),
-            _avatar.Flows().ToMargin(top: t1, left: l1).ToLayoutBounds(0, 0),
-            _nameLabel.Flows().ToMargin(top: t1 + 5, left: l2).ToLayoutBounds(0, 0),
-            _dateLabel.Flows().ToMargin(top: t1 + 30, left: l2).ToLayoutBounds(0, 0),
-            _addButton.Flows().ToMargin(top: t1, right: r1).ToDouble(ScaleProperty, 1).ToLayoutBounds(1, 0),
-            _playlistNameLabel.Flows().ToMargin(top: t2).ToDouble(ScaleProperty, 1).ToLayoutBounds(0.5, 0),
-            _dataLayout.Flows().ToMargin(top: t2 + 60).ToLayoutBounds(0.5, 0),
-            _descriptionLabel.Flows().ToDouble(OpacityProperty, 0),
-            _downloadButton.Flows().ToDouble(OpacityProperty, 0),
-            _moreButton.Flows().ToDouble(OpacityProperty, 0));
+            _root.Flows(
+                (HeightRequestProperty, 500),
+                (MaximumWidthRequestProperty, 600)),
+            _backButton.Flows(
+                (OpacityProperty, 0)),
+            _avatar.Flows(
+                (MarginProperty, new Thickness(l1, t1, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0, 0))),
+            _nameLabel.Flows(
+                (MarginProperty, new Thickness(l2, t1 + 5, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0, 0))),
+            _dateLabel.Flows(
+                (MarginProperty, new Thickness(l2, t1 + 30, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0, 0))),
+            _addButton.Flows(
+                (MarginProperty, new Thickness(0, t1, r1, 0)),
+                (ScaleProperty, 1),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(1, 0))),
+            _playlistNameLabel.Flows(
+                (MarginProperty, new Thickness(0, t2, 0, 0)),
+                (ScaleProperty, 1),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _dataLayout.Flows(
+                (MarginProperty, new Thickness(0, t2 + 60, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _descriptionLabel.Flows(
+                (OpacityProperty, 0)),
+            _downloadButton.Flows(
+                (OpacityProperty, 0)),
+            _moreButton.Flows(
+                (OpacityProperty, 0)));
 
         HasTransitionState<Playlist>(
-            _root.Flows().ToDouble(HeightRequestProperty, 650).ToDouble(MaximumWidthRequestProperty, 2000),
-            _backButton.Flows().ToDouble(OpacityProperty, 1),
-            _avatar.Flows().ToMargin(top: t1).ToLayoutBounds(0.5, 0),
-            _nameLabel.Flows().ToMargin(top: t2).ToLayoutBounds(0.5, 0),
-            _dateLabel.Flows().ToMargin(top: t2 + 25).ToLayoutBounds(0.5, 0),
-            _addButton.Flows().ToMargin(top: 50, left: 25).ToDouble(ScaleProperty, 0.5).ToLayoutBounds(0.5, 0),
-            _playlistNameLabel.Flows().ToMargin(top: t2 + 60).ToDouble(ScaleProperty, 1.5).ToLayoutBounds(0.5, 0),
-            _dataLayout.Flows().ToMargin(top: t2 + 120).ToLayoutBounds(0.5, 0),
-            _descriptionLabel.Flows().ToMargin(top: 20).ToDouble(OpacityProperty, 1),
-            _downloadButton.Flows().ToDouble(OpacityProperty, 1),
-            _moreButton.Flows().ToDouble(OpacityProperty, 1));
+            _root.Flows(
+                (HeightRequestProperty, 650),
+                (MaximumWidthRequestProperty, 2000)),
+            _backButton.Flows(
+                (OpacityProperty, 1)),
+            _avatar.Flows(
+                (MarginProperty, new Thickness(0, t1, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _nameLabel.Flows(
+                (MarginProperty, new Thickness(0, t2, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _dateLabel.Flows(
+                (MarginProperty, new Thickness(0, t2 + 25, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _addButton.Flows(
+                (MarginProperty, new Thickness(25, 50, 0, 0)),
+                (ScaleProperty, 0.5),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _playlistNameLabel.Flows(
+                (MarginProperty, new Thickness(0, t2 + 60, 0, 0)),
+                (ScaleProperty, 1.5),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _dataLayout.Flows(
+                (MarginProperty, new Thickness(0, t2 + 120, 0, 0)),
+                (AbsoluteLayout.LayoutBoundsProperty, new Point(0.5, 0))),
+            _descriptionLabel.Flows(
+                (OpacityProperty, 1)),
+            _downloadButton.Flows(
+                (OpacityProperty, 1)),
+            _moreButton.Flows(
+                (OpacityProperty, 1)));
     }
 
     public Style<Button> ButtonStyle => new Style<Button>()
