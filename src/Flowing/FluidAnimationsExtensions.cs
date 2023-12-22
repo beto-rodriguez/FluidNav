@@ -33,7 +33,7 @@ public static class FluidAnimationsExtensions
 #pragma warning disable IDE0045 // Convert to conditional expression
                 if (value is Rect rect)
                 {
-                    _ = flow.ToLayoutBounds(((Rect)value).X, ((Rect)value).Y, ((Rect)value).Width, ((Rect)value).Height);
+                    _ = flow.ToLayoutBounds(rect);
                 }
                 else if (value is Point point)
                 {
@@ -149,25 +149,31 @@ public static class FluidAnimationsExtensions
     public static Flow ToLayoutBounds(
         this Flow flow, double x, double y, double start = 0, double end = 1)
     {
-        return flow.ToLayoutBounds(x, y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize, start, end);
+        return ToLayoutBounds(flow, new Rect(x, y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize), start, end);
     }
 
     public static Flow ToLayoutBounds(
         this Flow flow, double x, double y, double width, double height, double start = 0, double end = 1)
     {
+        return ToLayoutBounds(flow, new Rect(x, y, width, height), start, end);
+    }
+
+    public static Flow ToLayoutBounds(
+        this Flow flow, Rect value, double start = 0, double end = 1)
+    {
         return flow.Add(
             new FlowProperty(
                 flow.View,
                 AbsoluteLayout.LayoutBoundsProperty,
-                new Rect(x, y, width, height),
+                value,
                 () =>
                 {
                     var start = (Rect)flow.View.GetValue(AbsoluteLayout.LayoutBoundsProperty);
                     return t => new Rect(
-                        start.X + t * (x - start.X),
-                        start.Y + t * (y - start.Y),
-                        start.Width + t * (width - start.Width),
-                        start.Height + t * (height - start.Height));
+                        start.X + t * (value.X - start.X),
+                        start.Y + t * (value.Y - start.Y),
+                        start.Width + t * (value.Width - start.Width),
+                        start.Height + t * (value.Height - start.Height));
                 },
                 start,
                 end));

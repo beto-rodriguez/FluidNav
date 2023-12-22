@@ -149,6 +149,17 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         var nextView = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
+        if (isHotReload)
+        {
+            if (nextView is FluidView fv)
+            {
+                fv.Content = fv.GetView();
+                _ = fv.TransitionView?.Complete(targetType);
+            }
+
+            return nextView;
+        }
+
         nextView.IsVisible = true;
         // if we don't call the animations api it seems that the view is not visible for a reason.
         //nextView.Opacity = 1;
@@ -168,27 +179,15 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                     .ToDouble(VisualElement.WidthRequestProperty, tb.Width)
                     .ToDouble(VisualElement.HeightRequestProperty, tb.Height));
 
-                _ = await _activeView.TransitionView.Flow(targetType);
+                _ = await _activeView.TransitionView.Animate(targetType);
             }
         }
 
-        if (!isHotReload) _ = (_activeView?.FadeTo(0, 500));
+        _ = (_activeView?.FadeTo(0, 500));
         Current?.View.ShowView(nextView);
 
         if (nextView is FluidView fluidView)
         {
-            if (isHotReload)
-            {
-                try
-                {
-                    fluidView.Content = fluidView.GetView();
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine($"Failed to hot reload {fluidView.GetType().Name}: {ex.Message}");
-                }
-            }
-
             fluidView.OnEntering();
 
             if (fluidView.TransitionView is not null)
@@ -210,8 +209,8 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
                 if (_activeViewType is not null)
                 {
-                    _ = fluidView.TransitionView.FlowToResult(_activeViewType);
-                    _ = await fluidView.TransitionView.Flow(targetType);
+                    _ = fluidView.TransitionView.Complete(_activeViewType);
+                    _ = await fluidView.TransitionView.Animate(targetType);
                 }
             }
 

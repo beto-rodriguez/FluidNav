@@ -18,24 +18,14 @@ public abstract class TransitionView : ContentView
         return _flows.Remove(typeof(TView));
     }
 
-    public TransitionView FlowToResult<TView>()
+    public TransitionView Complete(Type type)
     {
-        return this.Complete(_flows[typeof(TView)]);
+        return FluidAnimationsExtensions.Complete(this, _flows[type]);
     }
 
-    public TransitionView FlowToResult(Type type)
+    public Task<bool> Animate(Type type)
     {
-        return this.Complete(_flows[type]);
-    }
-
-    public Task<bool> Flow<TView>()
-    {
-        return this.Animate(_flows[typeof(TView)]);
-    }
-
-    public Task<bool> Flow(Type type)
-    {
-        return this.Animate(_flows[type]);
+        return FluidAnimationsExtensions.Animate(this, _flows[type]);
     }
 
     /// <summary>
@@ -71,7 +61,7 @@ public abstract class TransitionView : ContentView
 
                     _ = FlowNavigation.Current.GoTo<TToView>(routeParamsBuilder?.Invoke(transitionView.BindingContext));
                 })
-                .FlowToResult<TFromView>();
+                .Complete(typeof(TFromView));
 
             return transitionView;
         });
