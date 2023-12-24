@@ -27,13 +27,13 @@ public abstract class TransitionView : ResponsiveView
     public TransitionView Complete(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
-        return FluidAnimationsExtensions.Complete(this, flow ?? GetBreakpointFlow(type, ActiveBreakpoint));
+        return FluidAnimationsExtensions.Complete(this, flow ?? GetBreakpointFlow(type));
     }
 
     public Task<bool> Animate(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
-        return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type, ActiveBreakpoint));
+        return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type));
     }
 
     /// <summary>
@@ -71,13 +71,15 @@ public abstract class TransitionView : ResponsiveView
                 })
                 .Complete(typeof(TFromView));
 
+            transitionView.OnBreakpointChanged();
+
             return transitionView;
         });
     }
 
-    protected override void OnBreakpointChanged(BreakPoint breakPoint)
+    protected override void OnBreakpointChanged()
     {
-        base.OnBreakpointChanged(breakPoint);
+        base.OnBreakpointChanged();
 
         _ = Complete(_activeType);
     }
@@ -93,15 +95,16 @@ public abstract class TransitionView : ResponsiveView
         typeFlows[(int)breakpoint] = flow;
     }
 
-    private IEnumerable<Flow> GetBreakpointFlow(Type type, BreakPoint breakpoint)
+    private IEnumerable<Flow> GetBreakpointFlow(Type type)
     {
         var flowsOnType = _flows[type];
-        var i = (int)breakpoint;
+        var i = (int)FlowNavigation.Current.View.ActiveBreakpoint;
         var flow = flowsOnType[i];
 
         while (flow is null && i > 0)
             flow = flowsOnType[--i];
 
-        return flow ?? throw new Exception($"No flow found for {type.Name} at breakpoint {breakpoint}");
+        return flow ??
+            throw new Exception($"No flow found for {type.Name} at breakpoint {FlowNavigation.Current.View.ActiveBreakpoint}");
     }
 }

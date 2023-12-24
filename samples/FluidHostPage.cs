@@ -29,7 +29,7 @@ public class FluidHostPage : ContentPage, IFluidHost
             if (bp == ActiveBreakpoint) return;
 
             ActiveBreakpoint = bp;
-            BreakpointChanged?.Invoke(ActiveBreakpoint);
+            BreakpointChanged?.Invoke();
         };
 
         Presenter = _presenter;
@@ -38,7 +38,7 @@ public class FluidHostPage : ContentPage, IFluidHost
     public View Presenter { get; }
     public BreakPoint ActiveBreakpoint { get; private set; } = BreakPoint.sm;
 
-    public event Action<BreakPoint>? BreakpointChanged;
+    public event Action? BreakpointChanged;
 
     public void ShowView(View view)
     {

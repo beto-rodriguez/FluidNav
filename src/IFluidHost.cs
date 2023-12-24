@@ -28,7 +28,7 @@ public interface IFluidHost
     /// <summary>
     /// Called when the breakpoint changes.
     /// </summary>
-    event Action<BreakPoint> BreakpointChanged;
+    event Action BreakpointChanged;
 
     /// <summary>
     /// Shows the specified view.

@@ -5,6 +5,7 @@ public abstract class FluidView : ResponsiveView
     public FluidView()
     {
         Content = GetView();
+        OnBreakpointChanged();
     }
 
     public TransitionView? TransitionView { get; private set; }
