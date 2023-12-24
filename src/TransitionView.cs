@@ -2,31 +2,10 @@
 
 namespace FluidNav;
 
-public abstract class TransitionView : ContentView
+public abstract class TransitionView : ResponsiveView
 {
-    private BreakPoint _activeBreakpoint = BreakPoint.sm;
     private Type _activeType = typeof(object);
     private readonly Dictionary<Type, IEnumerable<Flow>[]> _flows = [];
-    private static readonly Dictionary<int, int> s_screens = new()
-    {
-        { (int)BreakPoint.sm, 640 },
-        { (int)BreakPoint.md, 768 },
-        { (int)BreakPoint.lg, 1024 },
-        { (int)BreakPoint.xl, 1280 },
-        { (int)BreakPoint.xxl, 1536 }
-    };
-
-    public TransitionView()
-    {
-        SizeChanged += (s, e) =>
-        {
-            var flow = GetBreakpointFlow(_activeType, out var breakPoint);
-            if (breakPoint == _activeBreakpoint) return;
-
-            _activeBreakpoint = breakPoint;
-            _ = Complete(_activeType);
-        };
-    }
 
     public Rect TransitionBounds { get; set; }
 
@@ -48,13 +27,13 @@ public abstract class TransitionView : ContentView
     public TransitionView Complete(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
-        return FluidAnimationsExtensions.Complete(this, flow ?? GetBreakpointFlow(type, out _activeBreakpoint));
+        return FluidAnimationsExtensions.Complete(this, flow ?? GetBreakpointFlow(type, ActiveBreakpoint));
     }
 
     public Task<bool> Animate(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
-        return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type, out _activeBreakpoint));
+        return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type, ActiveBreakpoint));
     }
 
     /// <summary>
@@ -96,6 +75,13 @@ public abstract class TransitionView : ContentView
         });
     }
 
+    protected override void OnBreakpointChanged(BreakPoint breakPoint)
+    {
+        base.OnBreakpointChanged(breakPoint);
+
+        _ = Complete(_activeType);
+    }
+
     private void SetBreakpointFlow(Type type, BreakPoint breakpoint, IEnumerable<Flow> flow)
     {
         if (!_flows.TryGetValue(type, out var typeFlows))
@@ -107,33 +93,15 @@ public abstract class TransitionView : ContentView
         typeFlows[(int)breakpoint] = flow;
     }
 
-    private IEnumerable<Flow> GetBreakpointFlow(Type type, out BreakPoint breakPoint)
+    private IEnumerable<Flow> GetBreakpointFlow(Type type, BreakPoint breakpoint)
     {
-        var view = FlowNavigation.Current.View ?? throw new Exception("Host view not found");
+        var flowsOnType = _flows[type];
+        var i = (int)breakpoint;
+        var flow = flowsOnType[i];
 
-        var screenWidth = view.Width;
-        var ft = _flows[type];
+        while (flow is null && i > 0)
+            flow = flowsOnType[--i];
 
-        var flows = ft[(int)BreakPoint.sm];
-        breakPoint = BreakPoint.sm;
-
-        bool evaluateBreakpoint(BreakPoint bp)
-        {
-            if (screenWidth >= s_screens[(int)bp])
-            {
-                var f = ft![(int)bp];
-                flows = f ?? flows;
-                return f is not null;
-            }
-
-            return false;
-        }
-
-        if (evaluateBreakpoint(BreakPoint.md)) breakPoint = BreakPoint.md;
-        if (evaluateBreakpoint(BreakPoint.lg)) breakPoint = BreakPoint.lg;
-        if (evaluateBreakpoint(BreakPoint.xl)) breakPoint = BreakPoint.xl;
-        if (evaluateBreakpoint(BreakPoint.xxl)) breakPoint = BreakPoint.xxl;
-
-        return flows;
+        return flow ?? throw new Exception($"No flow found for {type.Name} at breakpoint {breakpoint}");
     }
 }

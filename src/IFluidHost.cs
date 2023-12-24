@@ -21,6 +21,16 @@ public interface IFluidHost
     View Presenter { get; }
 
     /// <summary>
+    /// Gets the active breakpoint.
+    /// </summary>
+    BreakPoint ActiveBreakpoint { get; }
+
+    /// <summary>
+    /// Called when the breakpoint changes.
+    /// </summary>
+    event Action<BreakPoint> BreakpointChanged;
+
+    /// <summary>
     /// Shows the specified view.
     /// </summary>
     void ShowView(View view);

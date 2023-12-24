@@ -1,6 +1,6 @@
 ﻿namespace FluidNav;
 
-public abstract class FluidView : ContentView
+public abstract class FluidView : ResponsiveView
 {
     public FluidView()
     {
