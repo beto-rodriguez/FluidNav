@@ -1,5 +1,15 @@
 ﻿namespace FluidNav.Flowing;
 
+/// <summary>
+/// A property that handles the view transitions, this property is able to animate softly to the target value
+/// or complete it instantly, the property will use this feature to animate the view transitions.
+/// </summary>
+/// <param name="bindable"></param>
+/// <param name="property"></param>
+/// <param name="targetValue"></param>
+/// <param name="transform"></param>
+/// <param name="start"></param>
+/// <param name="end"></param>
 public class FlowProperty(
     BindableObject bindable,
     BindableProperty property,

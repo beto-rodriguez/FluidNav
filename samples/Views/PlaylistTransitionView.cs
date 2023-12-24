@@ -33,7 +33,7 @@ public class PlaylistTransitionView : TransitionView
         var t1 = 25;
         var t2 = 100;
 
-        HasTransitionState<PlaylistCollection>(
+        On<PlaylistCollection>(
             _root.Flows(
                 (HeightRequestProperty, 500),
                 (MaximumWidthRequestProperty, 600)),
@@ -66,7 +66,7 @@ public class PlaylistTransitionView : TransitionView
             _moreButton.Flows(
                 (OpacityProperty, 0)));
 
-        HasTransitionState<Playlist>(
+        On<Playlist>(
             _root.Flows(
                 (HeightRequestProperty, 650),
                 (MaximumWidthRequestProperty, 2000)),

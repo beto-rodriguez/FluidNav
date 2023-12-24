@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using FluidNav.Flowing;
+﻿using FluidNav.Flowing;
 
 namespace FluidNav;
 
@@ -173,11 +172,12 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             {
                 var tb = _activeView.TransitionView.TransitionBounds;
 
-                _ = ((View)_activeView).Animate(v => v.Flows()
-                    .ToDouble(VisualElement.TranslationXProperty, tb.Left)
-                    .ToDouble(VisualElement.TranslationYProperty, tb.Top)
-                    .ToDouble(VisualElement.WidthRequestProperty, tb.Width)
-                    .ToDouble(VisualElement.HeightRequestProperty, tb.Height));
+                _ = _activeView.Flows(
+                    (VisualElement.TranslationXProperty, tb.Left),
+                    (VisualElement.TranslationYProperty, tb.Top),
+                    (VisualElement.WidthRequestProperty, tb.Width),
+                    (VisualElement.HeightRequestProperty, tb.Height))
+                    .Animate();
 
                 _ = await _activeView.TransitionView.Animate(targetType);
             }
@@ -201,11 +201,12 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
                 var flowView = (Page?)Current?.View ?? throw new Exception("unable to get current view.");
 
-                _ = nextView.Animate(v => v.Flows()
-                    .ToDouble(VisualElement.TranslationXProperty, 0)
-                    .ToDouble(VisualElement.TranslationYProperty, 0)
-                    .ToDouble(VisualElement.WidthRequestProperty, flowView.Width)
-                    .ToDouble(VisualElement.HeightRequestProperty, flowView.Height));
+                _ = nextView.Flows(
+                    (VisualElement.TranslationXProperty, 0),
+                    (VisualElement.TranslationYProperty, 0),
+                    (VisualElement.WidthRequestProperty, flowView.Width),
+                    (VisualElement.HeightRequestProperty, flowView.Height))
+                    .Animate();
 
                 if (_activeViewType is not null)
                 {
