@@ -27,12 +27,14 @@ public abstract class TransitionView : ResponsiveView
     public TransitionView Complete(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
+        OnBreakpointChanged();
         return FluidAnimationsExtensions.Complete(this, flow ?? GetBreakpointFlow(type));
     }
 
     public Task<bool> Animate(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
+        OnBreakpointChanged();
         return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type));
     }
 
@@ -75,13 +77,6 @@ public abstract class TransitionView : ResponsiveView
 
             return transitionView;
         });
-    }
-
-    protected override void OnBreakpointChanged()
-    {
-        base.OnBreakpointChanged();
-
-        _ = Complete(_activeType);
     }
 
     private void SetBreakpointFlow(Type type, BreakPoint breakpoint, IEnumerable<Flow> flow)

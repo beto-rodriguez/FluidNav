@@ -153,6 +153,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             if (nextView is FluidView fv)
             {
                 fv.Content = fv.GetView();
+                fv.OnBreakpointChanged();
                 _ = fv.TransitionView?.Complete(targetType);
             }
 

@@ -46,10 +46,6 @@ public static class FluidAnimationsExtensions
                 }
 #pragma warning restore IDE0045 // Convert to conditional expression
             }
-            else if (property == View.VerticalOptionsProperty)
-            {
-
-            }
             else
             {
                 throw new ArgumentException($"The given type is not supported.", nameof(property));

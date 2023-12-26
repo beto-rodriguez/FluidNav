@@ -10,7 +10,7 @@ public abstract class ResponsiveView : ContentView
 
     public BreakPoint ActiveBreakpoint => FlowNavigation.Current.View.ActiveBreakpoint;
 
-    protected virtual void OnBreakpointChanged()
+    public virtual void OnBreakpointChanged()
     {
         var bp = (int)FlowNavigation.Current.View.ActiveBreakpoint;
 
