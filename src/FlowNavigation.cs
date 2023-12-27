@@ -132,8 +132,12 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         _ = Go(true);
     }
 
+    private bool _isNavigating;
+
     private async Task<View> Go(bool isHotReload = false)
     {
+        if (_isNavigating) return _activeView ?? throw new Exception("No active view found.");
+
         var routeParts = _navigationStack[_activeIndex].Split('?');
 
         var routeName = routeParts[0];
@@ -148,6 +152,8 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         var nextView = (View?)_services.GetService(targetType) ??
             throw new Exception($"View {targetType.Name} not found");
 
+        if (!isHotReload && nextView == _activeView) return _activeView;
+
         if (isHotReload)
         {
             if (nextView is FluidView fv)
@@ -159,6 +165,8 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
             return nextView;
         }
+
+        _isNavigating = true;
 
         nextView.IsVisible = true;
         // if we don't call the animations api it seems that the view is not visible for a reason.
@@ -220,6 +228,8 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             if (_activeView is not null) _activeView.IsVisible = false;
             _activeView = fluidView;
         }
+
+        _isNavigating = false;
 
         return nextView;
     }

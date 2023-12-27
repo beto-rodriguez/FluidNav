@@ -110,7 +110,7 @@ public static class FluidAnimationsExtensions
     /// <param name="animationName">The animation identifier name, by default a new Guid is used.</param>
     /// <returns>A task that completes when the animations ends.</returns>
     public static Task<bool> Animate(
-    this View view, IEnumerable<Flow> flowCollection, VisualElement? owner = null, uint duration = 500,
+        this View view, IEnumerable<Flow> flowCollection, VisualElement? owner = null, uint duration = 500,
     Easing? easing = null, uint fps = 60, string? animationName = null)
     {
         var parentAnimation = new Animation();

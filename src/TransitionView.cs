@@ -5,7 +5,7 @@ namespace FluidNav;
 public abstract class TransitionView : ResponsiveView
 {
     private Type _activeType = typeof(object);
-    private readonly Dictionary<Type, IEnumerable<Flow>[]> _flows = [];
+    private readonly Dictionary<Type, FlowCollection[]> _flows = [];
 
     public Rect TransitionBounds { get; set; }
 
@@ -27,15 +27,18 @@ public abstract class TransitionView : ResponsiveView
     public TransitionView Complete(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
-        OnBreakpointChanged();
         return FluidAnimationsExtensions.Complete(this, flow ?? GetBreakpointFlow(type));
     }
 
     public Task<bool> Animate(Type type, IEnumerable<Flow>? flow = null)
     {
         _activeType = type;
-        OnBreakpointChanged();
         return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type));
+    }
+
+    public override void OnBreakpointChanged()
+    {
+        _ = Complete(_activeType);
     }
 
     /// <summary>
@@ -83,11 +86,11 @@ public abstract class TransitionView : ResponsiveView
     {
         if (!_flows.TryGetValue(type, out var typeFlows))
         {
-            typeFlows = new IEnumerable<Flow>[(int)BreakPoint.xxl + 1];
+            typeFlows = new FlowCollection[(int)BreakPoint.xxl + 1];
             _flows[type] = typeFlows;
         }
 
-        typeFlows[(int)breakpoint] = flow;
+        typeFlows[(int)breakpoint] = new FlowCollection { Flows = flow, Name = $"{type.Name}, {breakpoint}" };
     }
 
     private IEnumerable<Flow> GetBreakpointFlow(Type type)
@@ -99,7 +102,18 @@ public abstract class TransitionView : ResponsiveView
         while (flow is null && i > 0)
             flow = flowsOnType[--i];
 
-        return flow ??
+        return flow?.Flows ??
             throw new Exception($"No flow found for {type.Name} at breakpoint {FlowNavigation.Current.View.ActiveBreakpoint}");
+    }
+
+    private class FlowCollection
+    {
+        public required string Name { get; set; }
+        public required IEnumerable<Flow> Flows { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
