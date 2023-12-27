@@ -48,7 +48,7 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
 #endif
     }
 
-    protected override void OnBreakpointChanged()
+    public override void OnBreakpointChanged()
     {
         // workaround for  https://github.com/dotnet/maui/issues/7747
         Content = GetView();
