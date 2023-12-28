@@ -21,8 +21,5 @@ public class RouteParams
         }
     }
 
-    internal void Clear()
-    {
-        _params.Clear();
-    }
+    internal void Clear() => _params.Clear();
 }

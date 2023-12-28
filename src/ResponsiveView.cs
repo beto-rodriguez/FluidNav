@@ -30,10 +30,7 @@ public abstract class ResponsiveView : ContentView
         _rules = rules;
     }
 
-    public void ClearRules()
-    {
-        _rules = [];
-    }
+    public void ClearRules() => _rules = [];
 
     private class Rule
     {

@@ -14,13 +14,7 @@ public class Flow(View view) : IEnumerable<FlowProperty>
         return this;
     }
 
-    public IEnumerator<FlowProperty> GetEnumerator()
-    {
-        return _flowProperties.GetEnumerator();
-    }
+    public IEnumerator<FlowProperty> GetEnumerator() => _flowProperties.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return _flowProperties.GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => _flowProperties.GetEnumerator();
 }

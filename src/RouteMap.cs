@@ -32,10 +32,7 @@ public class RouteMap(IServiceCollection services)
     /// <param name="route">The route name. If not specified, the view type name in lower case will be used.</param>
     /// <returns>The current map.</returns>
     public RouteMap AddRoute<TView>(string? route = null)
-        where TView : ContentView
-    {
-        return AddRoute<TView, TView>();
-    }
+        where TView : ContentView => AddRoute<TView, TView>();
 
     /// <summary>
     /// Creates a route for a view, the view will be registered in the <see cref="IServiceCollection"/> with
@@ -65,8 +62,5 @@ public class RouteMap(IServiceCollection services)
     /// </summary>
     /// <param name="route">The route.</param>
     /// <returns>A value indicating whether the route is registered.</returns>
-    public bool Contains(string route)
-    {
-        return _routes.ContainsKey(route);
-    }
+    public bool Contains(string route) => _routes.ContainsKey(route);
 }

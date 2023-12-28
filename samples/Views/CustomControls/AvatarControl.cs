@@ -33,8 +33,6 @@ public class AvatarControl : Border
 
     private static void OnAvatarImageChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (newValue is null) return; // hot reload throws nulls, how to handle this?
-
         var avatar = (AvatarControl)bindable;
         avatar._image.Source = (ImageSource?)newValue;
     }

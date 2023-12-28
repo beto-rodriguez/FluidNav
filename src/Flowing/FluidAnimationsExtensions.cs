@@ -61,10 +61,7 @@ public static class FluidAnimationsExtensions
     /// <param name="view">The target view.</param>
     /// <param name="flowCollection">da flow.</param>
     /// <returns></returns>
-    public static T Complete<T>(this Flow flow) where T : View
-    {
-        return (T)flow.View.Complete([flow]);
-    }
+    public static T Complete<T>(this Flow flow) where T : View => (T)flow.View.Complete([flow]);
 
     /// <summary>
     /// Sets all the flow properties to their target values (without animations).
@@ -93,10 +90,7 @@ public static class FluidAnimationsExtensions
     /// <returns>A task that completes when the animations ends.</returns>
     public static Task<bool> Animate(
         this Flow flow, VisualElement? owner = null, uint duration = 500,
-        Easing? easing = null, uint fps = 60, string? animationName = null)
-    {
-        return flow.View.Animate([flow], owner, duration, easing, fps, animationName);
-    }
+        Easing? easing = null, uint fps = 60, string? animationName = null) => flow.View.Animate([flow], owner, duration, easing, fps, animationName);
 
     /// <summary>
     /// Starts a flow animation and returns a task that completes when the animation ends.

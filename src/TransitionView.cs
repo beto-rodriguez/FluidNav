@@ -9,20 +9,11 @@ public abstract class TransitionView : ResponsiveView
 
     public Rect TransitionBounds { get; set; }
 
-    public void On<TView>(params Flow[] flow)
-    {
-        SetBreakpointFlow(typeof(TView), BreakPoint.sm, flow);
-    }
+    public void On<TView>(params Flow[] flow) => SetBreakpointFlow(typeof(TView), BreakPoint.sm, flow);
 
-    public void On<TView>(BreakPoint breakPoint, params Flow[] flow)
-    {
-        SetBreakpointFlow(typeof(TView), breakPoint, flow);
-    }
+    public void On<TView>(BreakPoint breakPoint, params Flow[] flow) => SetBreakpointFlow(typeof(TView), breakPoint, flow);
 
-    public bool RemoveState<TView>()
-    {
-        return _flows.Remove(typeof(TView));
-    }
+    public bool RemoveState<TView>() => _flows.Remove(typeof(TView));
 
     public TransitionView Complete(Type type, IEnumerable<Flow>? flow = null)
     {
@@ -36,10 +27,7 @@ public abstract class TransitionView : ResponsiveView
         return FluidAnimationsExtensions.Animate(this, flow ?? GetBreakpointFlow(type));
     }
 
-    public override void OnBreakpointChanged()
-    {
-        _ = Complete(_activeType);
-    }
+    public override void OnBreakpointChanged() => _ = Complete(_activeType);
 
     /// <summary>
     /// Gets a template that animates the transition between two views.
@@ -111,9 +99,6 @@ public abstract class TransitionView : ResponsiveView
         public required string Name { get; set; }
         public required IEnumerable<Flow> Flows { get; set; }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 }

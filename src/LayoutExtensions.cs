@@ -2,10 +2,7 @@
 
 public static class LayoutExtensions
 {
-    public static T Ref<T>(this T view, out T reference) where T : View
-    {
-        return reference = view;
-    }
+    public static T Ref<T>(this T view, out T reference) where T : View => reference = view;
 
     public static Grid Rows(this Grid grid, RowDefinitionCollection rows)
     {

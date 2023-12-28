@@ -30,6 +30,16 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     public RouteMap ActiveRoutes { get; } = map;
 
     /// <summary>
+    /// Indicates whether the views fade when navigating.
+    /// </summary>
+    public bool Fades { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the transition duration.
+    /// </summary>
+    public uint TransitionDuration { get; set; } = 500;
+
+    /// <summary>
     /// Gets the view host.
     /// </summary>
     public IFluidHost View { get; set; } = view;
@@ -47,10 +57,8 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// </summary>
     /// <typeparam name="TView">The type of the view.</typeparam>
     /// <returns>The view</returns>
-    public TView GetView<TView>() where TView : View
-    {
-        return (TView)GetView(typeof(TView).Name);
-    }
+    public TView GetView<TView>() where TView : View =>
+        (TView)GetView(typeof(TView).Name);
 
     /// <summary>
     /// Gets the view of the given route name.
@@ -70,20 +78,16 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// </summary>
     /// <typeparam name="TRoute">The type of the route.</typeparam>
     /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
-    public Task<View> GoTo<TRoute>(string? queryParams = null)
-    {
-        return GoTo(typeof(TRoute).Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
-    }
+    public Task<View> GoTo<TRoute>(string? queryParams = null) =>
+        GoTo(typeof(TRoute).Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
 
     /// <summary>
     /// Navigates to the specified view type.
     /// </summary>
     /// <param name="type">The type of the route.</param>
     /// <param name="queryParams">The query parameters, e.g. id=10&name=john.</param>
-    public Task<View> GoTo(Type type, string? queryParams = null)
-    {
-        return GoTo(type.Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
-    }
+    public Task<View> GoTo(Type type, string? queryParams = null) =>
+        GoTo(type.Name + (queryParams is null ? string.Empty : $"?{queryParams}"));
 
     /// <summary>
     /// Navigates to the specified view type.
@@ -127,10 +131,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// <summary>
     /// Refreshes the current view.
     /// </summary>
-    public void OnHotReloaded()
-    {
-        _ = Go(true);
-    }
+    public void OnHotReloaded() => _ = Go(true);
 
     private bool _isNavigating;
 
@@ -169,9 +170,10 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         _isNavigating = true;
 
         nextView.IsVisible = true;
+
         // if we don't call the animations api it seems that the view is not visible for a reason.
         //nextView.Opacity = 1;
-        _ = nextView.FadeTo(1, 1);
+        if (Fades) _ = nextView.FadeTo(1, 1);
 
         if (_activeView is not null)
         {
@@ -181,18 +183,19 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
             {
                 var tb = _activeView.TransitionView.TransitionBounds;
 
-                _ = _activeView.Flows(
-                    (VisualElement.TranslationXProperty, tb.Left),
-                    (VisualElement.TranslationYProperty, tb.Top),
-                    (VisualElement.WidthRequestProperty, tb.Width),
-                    (VisualElement.HeightRequestProperty, tb.Height))
-                    .Animate();
+                _ = _activeView
+                    .Flows(
+                        (VisualElement.TranslationXProperty, tb.Left),
+                        (VisualElement.TranslationYProperty, tb.Top),
+                        (VisualElement.WidthRequestProperty, tb.Width),
+                        (VisualElement.HeightRequestProperty, tb.Height))
+                    .Animate(duration: TransitionDuration);
 
                 _ = await _activeView.TransitionView.Animate(targetType);
             }
         }
 
-        _ = (_activeView?.FadeTo(0, 500));
+        if (Fades) _ = (_activeView?.FadeTo(0, TransitionDuration));
         Current?.View.ShowView(nextView);
 
         if (nextView is FluidView fluidView)
@@ -210,12 +213,13 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
                 var flowView = (Page?)Current?.View ?? throw new Exception("unable to get current view.");
 
-                _ = nextView.Flows(
-                    (VisualElement.TranslationXProperty, 0),
-                    (VisualElement.TranslationYProperty, 0),
-                    (VisualElement.WidthRequestProperty, flowView.Width),
-                    (VisualElement.HeightRequestProperty, flowView.Height))
-                    .Animate();
+                _ = nextView
+                    .Flows(
+                        (VisualElement.TranslationXProperty, 0),
+                        (VisualElement.TranslationYProperty, 0),
+                        (VisualElement.WidthRequestProperty, flowView.Width),
+                        (VisualElement.HeightRequestProperty, flowView.Height))
+                    .Animate(duration: TransitionDuration);
 
                 if (_activeViewType is not null)
                 {
