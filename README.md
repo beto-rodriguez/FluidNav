@@ -9,8 +9,8 @@ Fluid nav is an experimental alternative to maui `Shell` it also uses a URI-base
 
 ### Disclaim
 
-It is an experiment, use it at your own risk, the performance seems great (using the Release build) even with "large" collections, because it uses a `CollectionView` to display the data.
+It is an experiment, use it at your own risk, the performance seems great (using the Release build) even with "large" collections, because it uses a `CollectionView` to display the data
 
-![mobile transition](https://github.com/beto-rodriguez/FluidNav/assets/10853349/6395b7c7-5f97-4cc2-8867-35b61cb5c05c)
+.![mobile transition](https://github.com/beto-rodriguez/FluidNav/assets/10853349/80055049-9684-43af-9200-10f35fd017ed)
 
-![desktop transition](https://github.com/beto-rodriguez/FluidNav/assets/10853349/25d73fb0-2b17-4998-b3ae-54ba3da03525)
+![desktop transition](https://github.com/beto-rodriguez/FluidNav/assets/10853349/2b1d77d5-11fb-4c9f-956b-b44e3b55116d)
