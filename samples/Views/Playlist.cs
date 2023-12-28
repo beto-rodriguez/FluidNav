@@ -9,17 +9,12 @@ namespace Sample.Views;
 
 public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 {
-    private readonly RouteParams _routeParams = routeParams;
-    private readonly DataAccessLayer _dal = dal;
-    private ScrollView _scrollView = null!;
-
-    public override View GetView()
-    {
-        return new ScrollView()
+    public override View GetView() =>
+        new ScrollView()
         {
             Content = new VerticalStackLayout()
             {
-                UseAsTransition(new PlaylistTransitionView()),
+                new PlaylistTransitionView().AsTransitionFor(this),
 
                 new VerticalStackLayout()
                 {
@@ -29,45 +24,32 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
                     Spacing = 15,
                     Children =
                     {
-                        GetAlbum("1"),
-                        GetAlbum("2"),
-                        GetAlbum("3"),
-                        GetAlbum("1"),
-                        GetAlbum("2"),
-                        GetAlbum("3"),
-                        GetAlbum("1"),
-                        GetAlbum("2"),
-                        GetAlbum("3"),
+                        GetAlbum("1"), GetAlbum("2"), GetAlbum("3"),
+                        GetAlbum("1"), GetAlbum("2"), GetAlbum("3"),
+                        GetAlbum("1"), GetAlbum("2"), GetAlbum("3"),
                     }
                 }
             }
         }
-        .Ref(out _scrollView);
-    }
-
-    public override void OnEntering()
-    {
-        var idParam = _routeParams["id"];
-        var id = int.Parse(idParam);
-
-        var user = _dal.Users.First(u => u.Id == id);
-
-        BindingContext = user;
-
-#if !WINDOWS
-        StatusBar.SetColor(user.BackgroundColor);
-        StatusBar.SetStyle(StatusBarStyle.LightContent);
-#endif
-
-        _ = _scrollView.ScrollToAsync(0, 0, false);
-    }
-
-    public static View GetAlbum(string name)
-    {
-        return new Grid
+        .OnEntering(this, scrollView =>
         {
-            RowDefinitions = new([new(Star), new(Star)]),
-            ColumnDefinitions = new([new(50), new(Star), new(50)]),
+            var id = int.Parse(routeParams["id"]);
+            var user = dal.Users.First(u => u.Id == id);
+
+            BindingContext = user;
+
+            _ = scrollView.ScrollToAsync(0, 0, false);
+
+            if (DeviceInfo.Platform == DevicePlatform.WinUI) return;
+            StatusBar.SetColor(user.BackgroundColor);
+            StatusBar.SetStyle(StatusBarStyle.LightContent);
+        });
+
+    public static View GetAlbum(string name) =>
+        new Grid
+        {
+            RowDefinitions = Rows.Define(Star, Star),
+            ColumnDefinitions = Columns.Define(50, Star, 50),
             Children =
             {
                 new Image()
@@ -115,5 +97,4 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
                 .RowSpan(2)
             }
         };
-    }
 }

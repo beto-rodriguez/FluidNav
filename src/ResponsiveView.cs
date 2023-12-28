@@ -2,32 +2,42 @@
 
 public abstract class ResponsiveView : ContentView
 {
+    private Rule[] _rules = [];
+
     public ResponsiveView()
     {
         var view = FlowNavigation.Current.View ?? throw new Exception("Host view not found");
         view.BreakpointChanged += OnBreakpointChanged;
     }
 
-    public BreakPoint ActiveBreakpoint => FlowNavigation.Current.View.ActiveBreakpoint;
+    public BreakPoint Breakpoint => FlowNavigation.Current.View.ActiveBreakpoint;
 
     public virtual void OnBreakpointChanged()
     {
-        var bp = (int)FlowNavigation.Current.View.ActiveBreakpoint;
+        foreach (var rule in _rules)
+        {
+            if (!rule.Predicate()) continue;
 
-        OnSm();
-        if (bp >= 1) OnMd();
-        if (bp >= 2) OnLg();
-        if (bp >= 3) OnXl();
-        if (bp >= 4) OnXxl();
+            rule.Action();
+        }
     }
 
-    protected virtual void OnSm() { }
+    public void AddRule(Func<bool> predicate, Action action)
+    {
+        var rules = new Rule[_rules.Length + 1];
+        Array.Copy(_rules, rules, _rules.Length);
+        rules[^1] = new Rule { Predicate = predicate, Action = action };
+        _rules = rules;
+    }
 
-    protected virtual void OnMd() { }
+    public void ClearRules()
+    {
+        _rules = [];
+    }
 
-    protected virtual void OnLg() { }
-
-    protected virtual void OnXl() { }
-
-    protected virtual void OnXxl() { }
+    private class Rule
+    {
+        public required Func<bool> Predicate { get; set; }
+        public required Action Action { get; set; }
+    }
 }

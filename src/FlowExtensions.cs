@@ -48,11 +48,6 @@ public static class FlowExtensions
         return (Page)host.View;
     }
 
-    public static T Ref<T>(this T view, out T reference) where T : View
-    {
-        return reference = view;
-    }
-
     /// <summary>
     /// Sets the content 
     /// </summary>

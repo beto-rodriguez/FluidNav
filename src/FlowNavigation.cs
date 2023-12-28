@@ -175,7 +175,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
         if (_activeView is not null)
         {
-            _activeView.OnLeaving();
+            _activeView.Leaving();
 
             if (_activeView.TransitionView?.TransitionBounds is not null)
             {
@@ -197,7 +197,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
 
         if (nextView is FluidView fluidView)
         {
-            fluidView.OnEntering();
+            fluidView.Entering();
 
             if (fluidView.TransitionView is not null)
             {

@@ -21,49 +21,24 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
         ItemSpacing = 15
     };
 
-    public override View GetView()
-    {
-        var collectionView = new CollectionView
+    public override View GetView() =>
+        new CollectionView
         {
-            ItemsLayout = FlowNavigation.Current.View.ActiveBreakpoint >= BreakPoint.lg
-                ? _largeScreenLayout
-                : _smallScreenLayout
-        };
+            ItemsLayout = Breakpoint >= BreakPoint.lg ? _largeScreenLayout : _smallScreenLayout
+        }
+        .ItemsSource(dal.Users)
+        .ItemTemplate(
+            TransitionView.Build<PlaylistCollection, Playlist, PlaylistTransitionView>(item =>
+            {
+                var user = (PlaylistVM)item;    // <- the item source
+                return $"id={user.Id}";         // <- the route params
+            }))
+        .OnEntering(this, v =>
+        {
+            if (DeviceInfo.Platform == DevicePlatform.WinUI) return;
+            StatusBar.SetColor(Colors.White);
+            StatusBar.SetStyle(StatusBarStyle.DarkContent);
+        });
 
-        return collectionView
-            .ItemsSource(dal.Users)
-            .ItemTemplate(
-                TransitionView.Build<PlaylistCollection, Playlist, PlaylistTransitionView>(item =>
-                {
-                    var user = (PlaylistVM)item;    // <- the item source
-                    return $"id={user.Id}";         // <- the route params
-                }));
-    }
-
-    public override void OnEntering()
-    {
-#if !WINDOWS
-        StatusBar.SetColor(Colors.White);
-        StatusBar.SetStyle(StatusBarStyle.DarkContent);
-#endif
-    }
-
-    public override void OnBreakpointChanged()
-    {
-        // workaround for  https://github.com/dotnet/maui/issues/7747
-        Content = GetView();
-    }
-
-    // should work when the next issue is fixed:
-    // https://github.com/dotnet/maui/issues/7747
-
-    protected override void OnSm()
-    {
-        //_collectionView.ItemsLayout = _smallScreenLayout;
-    }
-
-    protected override void OnLg()
-    {
-        //_collectionView.ItemsLayout = _largeScreenLayout;
-    }
+    public override void OnBreakpointChanged() => Content = GetView();
 }
