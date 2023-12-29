@@ -201,6 +201,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         if (nextView is FluidView fluidView)
         {
             fluidView.Entering();
+            fluidView.OnBreakpointChanged();
 
             if (fluidView.TransitionView is not null)
             {

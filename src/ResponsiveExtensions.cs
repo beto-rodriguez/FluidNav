@@ -49,7 +49,7 @@ public static class ResponsiveExtensions
     {
         responsiveView.AddRule(condition, predicate);
         return view;
-    }
+    } 
 
     public static T AsTransitionFor<T>(this T view, FluidView fluidView) where T : TransitionView
     {
