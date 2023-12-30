@@ -105,7 +105,6 @@ public class PlaylistTransitionView : TransitionView
         .Add(Button.TextColorProperty, Colors.Black)
         .Add(Button.FontSizeProperty, 18)
         .Add(Button.FontFamilyProperty, "Icons")
-        .Add(Button.CornerRadiusProperty, 100)
         .Add(Button.PaddingProperty, new Thickness(0));
 
     private void InitializeContent()
@@ -304,5 +303,11 @@ public class PlaylistTransitionView : TransitionView
         .Bind(
             BackgroundColorProperty,
             getter: (PlaylistVM vm) => vm.BackgroundColor);
+
+#if MACCATALYST || IOS
+        // BUG, the Tapped is not working on MacCatalyst
+        _backButton.Clicked += (s, e) => FlowNavigation.Current.GoBack();
+#endif
+
     }
 }

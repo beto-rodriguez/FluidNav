@@ -73,6 +73,9 @@ public static class FlowExtensions
 
         tapGesture.Tapped += (s, e) =>
         {
+            // not working properly on mac
+            // https://github.com/dotnet/maui/issues/19329
+
             var p = e.GetPosition(FlowNavigation.Current.View.Presenter);
             var p0 = e.GetPosition(view.Content);
 
