@@ -28,6 +28,8 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
         }
         .ItemsSource(dal.Users)
         .ItemTemplate(
+            // not working properly on mac
+            // https://github.com/dotnet/maui/issues/19329
             TransitionView.Build<PlaylistCollection, Playlist, PlaylistTransitionView>(item =>
             {
                 var user = (PlaylistVM)item;    // <- the item source
@@ -35,7 +37,7 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
             }))
         .OnEntering(this, v =>
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI) return;
+            if (DeviceInfo.Idiom == DeviceIdiom.Desktop) return;
             StatusBar.SetColor(Colors.White);
             StatusBar.SetStyle(StatusBarStyle.DarkContent);
         });

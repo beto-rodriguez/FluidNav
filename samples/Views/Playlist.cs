@@ -43,7 +43,7 @@ public class Playlist(RouteParams routeParams, DataAccessLayer dal) : FluidView
 
             _ = scrollView.ScrollToAsync(0, 0, false);
 
-            if (DeviceInfo.Platform == DevicePlatform.WinUI) return;
+            if (DeviceInfo.Idiom == DeviceIdiom.Desktop) return;
             StatusBar.SetColor(user.BackgroundColor);
             StatusBar.SetStyle(StatusBarStyle.LightContent);
         });

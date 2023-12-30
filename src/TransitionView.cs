@@ -46,7 +46,7 @@ public abstract class TransitionView : ResponsiveView
         {
             var transitionView = new TTransitionView();
 
-            _ = transitionView
+            _ = transitionView.Content
                 .OnTapped(p =>
                 {
                     var tv = FlowNavigation.Current.GetView<TToView>().TransitionView;
@@ -61,10 +61,9 @@ public abstract class TransitionView : ResponsiveView
                     }
 
                     _ = FlowNavigation.Current.GoTo<TToView>(routeParamsBuilder?.Invoke(transitionView.BindingContext));
-                })
-                .Complete(typeof(TFromView));
+                });
 
-            transitionView.OnBreakpointChanged();
+            transitionView.Complete(typeof(TFromView)).OnBreakpointChanged();
 
             return transitionView;
         });
