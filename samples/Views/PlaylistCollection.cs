@@ -42,5 +42,15 @@ public class PlaylistCollection(DataAccessLayer dal) : FluidView
             StatusBar.SetStyle(StatusBarStyle.DarkContent);
         });
 
-    public override void OnBreakpointChanged() => Content = GetView();
+    private bool _isLargeScreen;
+
+    public override void OnBreakpointChanged()
+    {
+        // workaround for https://github.com/dotnet/maui/issues/7747
+        var screenChanged = _isLargeScreen != (Breakpoint >= BreakPoint.lg);
+        if (!screenChanged) return;
+
+        _isLargeScreen = Breakpoint >= BreakPoint.lg;
+        Content = GetView();
+    }
 }
