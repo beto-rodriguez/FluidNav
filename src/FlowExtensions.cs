@@ -67,7 +67,7 @@ public static class FlowExtensions
     /// <param name="view"></param>
     /// <param name="action"></param>
     /// <returns></returns>
-    public static T OnTapped<T>(this T view, Action<Point> action) where T : ContentView
+    public static T OnTapped<T>(this T view, Action<Point> action) where T : View
     {
         var tapGesture = new TapGestureRecognizer();
 
@@ -77,7 +77,7 @@ public static class FlowExtensions
             // https://github.com/dotnet/maui/issues/19329
 
             var p = e.GetPosition(FlowNavigation.Current.View.Presenter);
-            var p0 = e.GetPosition(view.Content);
+            var p0 = e.GetPosition(view);
 
             if (p is null || p0 is null) return;
 
