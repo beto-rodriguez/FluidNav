@@ -44,6 +44,11 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// </summary>
     public IFluidHost View { get; set; } = view;
 
+    /// <summary>
+    /// Called when navigating.
+    /// </summary>
+    public event Action<View> Navigating;
+
     public void Initialize(IFluidHost host)
     {
         Current.View = host;
@@ -168,6 +173,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         }
 
         _isNavigating = true;
+        Navigating?.Invoke(nextView);
 
         nextView.IsVisible = true;
 
