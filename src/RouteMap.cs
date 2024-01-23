@@ -26,33 +26,35 @@ public class RouteMap(IServiceCollection services)
 
     /// <summary>
     /// Creates a route for a view, the view will be registered in the <see cref="IServiceCollection"/> with
-    /// a the view as its own BindingContext.
-    /// </summary>
-    /// <typeparam name="TView">The type of the view.</typeparam>
-    /// <param name="route">The route name. If not specified, the view type name in lower case will be used.</param>
-    /// <returns>The current map.</returns>
-    public RouteMap AddRoute<TView>(string? route = null)
-        where TView : ContentView => AddRoute<TView, TView>();
-
-    /// <summary>
-    /// Creates a route for a view, the view will be registered in the <see cref="IServiceCollection"/> with
     /// a new instance of the view model as the BindingContext.
     /// </summary>
     /// <typeparam name="TView">The type of the view.</typeparam>
-    /// <typeparam name="TViewModel">The type of the view model.</typeparam>
     /// <returns>The current map.</returns>
-    public RouteMap AddRoute<TView, TViewModel>()
+    public RouteMap AddRoute<TView>()
         where TView : ContentView
     {
         var viewType = typeof(TView);
-        var viewModelType = typeof(TViewModel);
         var routeName = viewType.Name;
 
         _routes.Add(routeName, viewType);
-        _ = services.AddSingleton(viewModelType);
         _ = services.AddSingleton(viewType);
 
         DefaultRoute ??= viewType;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a modal view to the service container.
+    /// </summary>
+    /// <typeparam name="TView">The type of the view.</typeparam>
+    /// <typeparam name="TResponse">The type of the response.</typeparam>
+    /// <returns>The route map instance.</returns>
+    public RouteMap AddModal<TView, TResponse>() where TView : ModalContent<TResponse>
+    {
+        var viewType = typeof(TView);
+
+        _ = services.AddTransient(viewType);
 
         return this;
     }

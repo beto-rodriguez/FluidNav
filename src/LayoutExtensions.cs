@@ -39,9 +39,4 @@ public static class LayoutExtensions
         return view;
     }
 
-    public static T MinHeight<T>(this T view, double height) where T : View
-    {
-        view.MinimumHeightRequest = height;
-        return view;
-    }
 }

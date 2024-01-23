@@ -8,26 +8,87 @@ namespace FluidNav;
 /// <remarks>
 /// Initializes a new instance of the <see cref="FlowNavigation"/> class.
 /// </remarks>
-/// <param name="provider">The service provider.</param>
-/// <param name="view">The view.</param>
-/// <param name="map">The map.</param>
-public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap map)
+public class FlowNavigation
 {
-    private readonly IServiceProvider _services = provider;
+    private bool _isInitialized = false;
+    private View? _currentView;
+    private int _zIndex = 0;
+    private readonly IServiceProvider _services;
     private List<string> _navigationStack = [];
     private int _activeIndex;
     private Type? _activeViewType;
+    internal FluidView _enteringView = null!;
     private FluidView? _activeView;
+    private bool _isNavigating;
+    private static FlowNavigation s_current = null!;
+    private static readonly Dictionary<int, int> s_screens = new()
+    {
+        { (int)BreakPoint.sm, 640 },
+        { (int)BreakPoint.md, 768 },
+        { (int)BreakPoint.lg, 1024 },
+        { (int)BreakPoint.xl, 1280 },
+        { (int)BreakPoint.xxl, 1536 }
+    };
+
+    public FlowNavigation(IServiceProvider serviceProvider, IFluidHost view, RouteMap map)
+    {
+        _services = serviceProvider;
+        View = view;
+        ActiveRoutes = map;
+
+        ((ContentPage)view).SizeChanged += (_, _) =>
+        {
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                ActiveBreakpoint = GetBreakpoint();
+
+                _ = Current.GoTo(Current.ActiveRoutes.DefaultRoute
+                    ?? throw new Exception("No default route was found."));
+            }
+
+            if (_currentView is not null)
+            {
+                _currentView.WidthRequest = Current.View.Width;
+                _currentView.HeightRequest = Current.View.Height;
+            }
+
+            var bp = GetBreakpoint();
+            if (bp == ActiveBreakpoint) return;
+
+            ActiveBreakpoint = bp;
+            BreakpointChanged?.Invoke();
+        };
+    }
 
     /// <summary>
     /// Gets the main fluid page.
     /// </summary>
-    public static FlowNavigation Current { get; internal set; } = null!;
+    public static FlowNavigation Current
+    {
+        get => s_current;
+        internal set { s_current = value; Loaded?.Invoke(value.View); }
+    }
+
+    /// <summary>
+    /// Called when the flow navigation is loaded.
+    /// </summary>
+    public static event Action<IFluidHost>? Loaded;
+
+    /// <summary>
+    /// Called when the breakpoint changes.
+    /// </summary>
+    public static event Action? BreakpointChanged;
+
+    /// <summary>
+    /// Called when navigating.
+    /// </summary>
+    public static event Action<View>? Navigating;
 
     /// <summary>
     /// Gets the active routes.
     /// </summary>
-    public RouteMap ActiveRoutes { get; } = map;
+    public RouteMap ActiveRoutes { get; }
 
     /// <summary>
     /// Indicates whether the views fade when navigating.
@@ -42,20 +103,17 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// <summary>
     /// Gets the view host.
     /// </summary>
-    public IFluidHost View { get; set; } = view;
+    public IFluidHost View { get; }
 
     /// <summary>
-    /// Called when navigating.
+    /// Gets the main page.
     /// </summary>
-    public event Action<View> Navigating;
+    public Page Page => (Page)View;
 
-    public void Initialize(IFluidHost host)
-    {
-        Current.View = host;
-
-        _ = Current.GoTo(
-            Current.ActiveRoutes.DefaultRoute ?? throw new Exception("No default route was found."));
-    }
+    /// <summary>
+    /// Gets the active breakpoint.
+    /// </summary>
+    public BreakPoint ActiveBreakpoint { get; private set; }
 
     /// <summary>
     /// Gets the view of the given type.
@@ -138,7 +196,56 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
     /// </summary>
     public void OnHotReloaded() => _ = Go(true);
 
-    private bool _isNavigating;
+    /// <summary>
+    /// Shows a modal with a view to get a response of type <typeparamref name="TResponse"/>.
+    /// </summary>
+    /// <typeparam name="TView"></typeparam>
+    /// <typeparam name="TResponse"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public Task<TResponse> Prompt<TView, TResponse>(string? alias = null)
+    {
+        var targetType = typeof(TView);
+
+        var modalContent = _services.GetService(targetType) as ModalContent<TResponse> ??
+            throw new Exception($"View {targetType.Name} not found or is not a modal of type {typeof(TResponse).Name}");
+
+        Current._enteringView = modalContent;
+
+        modalContent.Initialize();
+        modalContent.Entering();
+        modalContent.OnBreakpointChanged();
+
+        var modal = new ModalView(modalContent) { ZIndex = _zIndex++ };
+        AbsoluteLayout.SetLayoutBounds(modal, new(0, 0, Current.View.Width, Current.View.Height));
+
+        _ = new Flow(modal)
+          .ToDouble(VisualElement.TranslationYProperty, endValue: 0, fromValue: 600)
+          .ToDouble(VisualElement.ScaleXProperty, endValue: 1, fromValue: 0.6)
+          .Animate();
+
+        Current.View.AddToRoot(modal);
+
+        modalContent.ResponseTaskCompletionSource = new();
+
+        return modalContent.ResponseTaskCompletionSource.Task;
+    }
+
+    /// <summary>
+    /// Closes the given modal.
+    /// </summary>
+    internal async void CloseModal(ModalView modalView)
+    {
+        var dialog = modalView.Dialog;
+
+        _ = dialog.ScaleXTo(0.7, 500, Easing.CubicOut);
+        _ = modalView.FadeTo(0, 500, Easing.CubicOut);
+        _ = await dialog.TranslateTo(0, 600, 500, Easing.CubicOut);
+
+        modalView.ModalContent.Leaving();
+
+        Current.View.RemoveFromRoot(modalView);
+    }
 
     private async Task<View> Go(bool isHotReload = false)
     {
@@ -202,10 +309,20 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         }
 
         if (Fades) _ = (_activeView?.FadeTo(0, TransitionDuration));
-        Current?.View.ShowView(nextView);
+
+        var host = Current?.View ?? throw new Exception("unable to get current view.");
+
+        nextView.ZIndex = _zIndex++;
+        nextView.WidthRequest = host.Width;
+        nextView.HeightRequest = host.Height;
+
+        Current.View.AddToPresenter(_currentView = nextView);
 
         if (nextView is FluidView fluidView)
         {
+            _enteringView = fluidView;
+
+            fluidView.Initialize();
             fluidView.Entering();
             fluidView.OnBreakpointChanged();
 
@@ -218,7 +335,7 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
                 nextView.TranslationX = tb.X;
                 nextView.TranslationY = tb.Y;
 
-                var flowView = (Page?)Current?.View ?? throw new Exception("unable to get current view.");
+                var flowView = (Page?)Current.View ?? throw new Exception("unable to get current view.");
 
                 _ = nextView
                     .Flows(
@@ -243,5 +360,20 @@ public class FlowNavigation(IServiceProvider provider, IFluidHost view, RouteMap
         _isNavigating = false;
 
         return nextView;
+    }
+
+    private static BreakPoint GetBreakpoint()
+    {
+        var screenWidth = Current.View.Width;
+
+        // sm is the default breakpoint
+        var breakPoint = BreakPoint.sm;
+
+        if (screenWidth >= s_screens[1]) breakPoint = BreakPoint.md;
+        if (screenWidth >= s_screens[2]) breakPoint = BreakPoint.lg;
+        if (screenWidth >= s_screens[3]) breakPoint = BreakPoint.xl;
+        if (screenWidth >= s_screens[4]) breakPoint = BreakPoint.xxl;
+
+        return breakPoint;
     }
 }

@@ -49,7 +49,9 @@ public abstract class TransitionView : ResponsiveView
             _ = transitionView.Content
                 .OnTapped(p =>
                 {
-                    var tv = FlowNavigation.Current.GetView<TToView>().TransitionView;
+                    var toView = FlowNavigation.Current.GetView<TToView>();
+                    toView.Initialize();
+                    var tv = toView.TransitionView;
 
                     if (tv is not null)
                     {
@@ -83,14 +85,14 @@ public abstract class TransitionView : ResponsiveView
     private IEnumerable<Flow> GetBreakpointFlow(Type type)
     {
         var flowsOnType = _flows[type];
-        var i = (int)FlowNavigation.Current.View.ActiveBreakpoint;
+        var i = (int)FlowNavigation.Current.ActiveBreakpoint;
         var flow = flowsOnType[i];
 
         while (flow is null && i > 0)
             flow = flowsOnType[--i];
 
         return flow?.Flows ??
-            throw new Exception($"No flow found for {type.Name} at breakpoint {FlowNavigation.Current.View.ActiveBreakpoint}");
+            throw new Exception($"No flow found for {type.Name} at breakpoint {FlowNavigation.Current.ActiveBreakpoint}");
     }
 
     private class FlowCollection

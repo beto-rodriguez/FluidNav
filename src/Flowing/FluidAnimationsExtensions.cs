@@ -58,8 +58,6 @@ public static class FluidAnimationsExtensions
     /// <summary>
     /// Sets all the flow properties to their target values (without animations).
     /// </summary>
-    /// <param name="view">The target view.</param>
-    /// <param name="flowCollection">da flow.</param>
     /// <returns></returns>
     public static T Complete<T>(this Flow flow) where T : View => (T)flow.View.Complete([flow]);
 
@@ -202,23 +200,23 @@ public static class FluidAnimationsExtensions
             end));
     }
 
-    private static Flow ToDouble(
-        this Flow flow, BindableProperty property, double value, double start = 0, double end = 1)
+    public static Flow ToDouble(
+        this Flow flow, BindableProperty property, double endValue, double? fromValue = null, double start = 0, double end = 1)
     {
+#pragma warning disable IDE0046 // Convert to conditional expression
         if (property.ReturnType != typeof(double))
             throw new ArgumentException("Property flow error. Property must be of type double", nameof(property));
-
-        var a = (double)flow.View.GetValue(property);
+#pragma warning restore IDE0046 // Convert to conditional expression
 
         return flow.Add(
             new FlowProperty(
                 flow.View,
                 property,
-                value,
+                endValue,
                 () =>
                 {
-                    var start = (double)flow.View.GetValue(property);
-                    return t => start + t * (value - start);
+                    var start = fromValue ?? (double)flow.View.GetValue(property);
+                    return t => start + t * (endValue - start);
                 },
                 start,
                 end));

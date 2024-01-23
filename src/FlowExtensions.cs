@@ -26,11 +26,15 @@ public static class FlowExtensions
 
                 if (host is Page hostPage) NavigationPage.SetHasNavigationBar(hostPage, false);
 
-                return map.DefaultRoute is null
+                var f = map.DefaultRoute is null
                     ? throw new Exception("Default route not set")
                     : FlowNavigation.Current = new FlowNavigation(provider, host, map);
+
+                return f;
             })
             .AddSingleton(typeof(RouteParams));
+
+        _ = builder.ConfigureFonts(fonts => fonts.AddFont("flownav_icons.ttf", "flownav_icons"));
 
         return builder;
     }

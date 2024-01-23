@@ -2,14 +2,9 @@
 
 public abstract class FluidView : ResponsiveView
 {
+    private bool _isInitialized;
     private Action[] _entering = [];
     private Action[] _leaving = [];
-
-    public FluidView()
-    {
-        Content = GetView();
-        OnBreakpointChanged();
-    }
 
     public TransitionView? TransitionView { get; private set; }
 
@@ -41,6 +36,15 @@ public abstract class FluidView : ResponsiveView
     {
         _entering = [];
         _leaving = [];
+    }
+
+    internal void Initialize()
+    {
+        if (_isInitialized) return;
+
+        _isInitialized = true;
+        Content = GetView();
+
     }
 
     internal void Entering()

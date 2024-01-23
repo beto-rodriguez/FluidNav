@@ -21,17 +21,26 @@ public interface IFluidHost
     View Presenter { get; }
 
     /// <summary>
-    /// Gets the active breakpoint.
+    /// Adds the given view to the root layout.
     /// </summary>
-    BreakPoint ActiveBreakpoint { get; }
+    /// <param name="view">The view.</param>
+    void AddToRoot(View view);
 
     /// <summary>
-    /// Called when the breakpoint changes.
+    /// Removes the given view from the root layout.
     /// </summary>
-    event Action BreakpointChanged;
+    /// <param name="view"></param>
+    void RemoveFromRoot(View view);
 
     /// <summary>
-    /// Shows the specified view.
+    /// Adds the given view to the presenter.
     /// </summary>
-    void ShowView(View view);
+    /// <param name="view"></param>
+    void AddToPresenter(View view);
+
+    /// <summary>
+    /// Removes the given view from the presenter.
+    /// </summary>
+    /// <param name="view"></param>
+    void RemoveFromPresenter(View view);
 }
